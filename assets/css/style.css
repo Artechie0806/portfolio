@@ -953,6 +953,9 @@
     .scroll-hint { left: 2rem; }
     .about-grid { grid-template-columns: 1fr; gap: 2rem; }
     .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .projects-grid {
+    grid-template-columns: 1fr;
+  }
     footer { padding: 2rem; }
     .resume-box { padding: 2rem; }
     .section-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
