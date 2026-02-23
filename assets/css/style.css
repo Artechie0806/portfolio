@@ -885,23 +885,48 @@
 
   /* ── FOOTER ── */
   footer {
-    background: var(--ink);
+    /* This will now swap automatically based on your theme variables */
+    background: var(--ink); 
     color: var(--cream);
+    
     padding: 2.5rem 6rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
+    border-top: 1px solid var(--border);
   }
+
   footer p {
     font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     letter-spacing: 0.08em;
-    color: rgba(245,240,232,0.5);
+    /* Changed from hardcoded RGBA to your variable */
+    color: var(--ink-muted); 
   }
-  footer a { color: rgba(245,240,232,0.5); text-decoration: none; transition: color 0.2s; }
-  footer a:hover { color: var(--accent-warm); }
+
+  footer a { 
+    /* Using your variable ensures visibility in both modes */
+    color: var(--ink-muted); 
+    text-decoration: none; 
+    transition: all 0.2s ease; 
+  }
+
+  footer a:hover { 
+    color: var(--accent-warm); 
+    opacity: 1;
+  }
+
+/* ── MOBILE FOOTER ── */
+@media (max-width: 900px) {
+  footer {
+    padding: 2rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+}
 
   /* ── ANIMATIONS ── */
   @keyframes fadeUp {
