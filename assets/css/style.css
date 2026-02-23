@@ -902,7 +902,6 @@
     font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     letter-spacing: 0.08em;
-    /* Changed from hardcoded RGBA to your variable */
     color: var(--ink-muted); 
   }
 
