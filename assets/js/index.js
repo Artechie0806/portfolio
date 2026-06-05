@@ -1,4 +1,57 @@
 
+// ── PAGE LOADER ──
+(function () {
+  var loader = document.getElementById('loader');
+  var root = document.documentElement;
+  if (!loader) { root.classList.remove('loading'); return; }
+
+  function reveal() {
+    root.classList.remove('loading');
+    loader.classList.add('loader-done');
+    setTimeout(function () { if (loader && loader.parentNode) loader.parentNode.removeChild(loader); }, 700);
+  }
+
+  // Show the loader on every page load.
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var fill = loader.querySelector('.loader-bar-fill');
+  var count = loader.querySelector('.loader-count');
+
+  var COUNT_MS = reduce ? 500 : 1700; // count + fill duration
+  var start = null;
+
+  function ease(t) { return 1 - Math.pow(1 - t, 3); } // easeOutCubic
+
+  function tick(ts) {
+    if (start === null) start = ts;
+    var t = Math.min((ts - start) / COUNT_MS, 1);
+    var v = ease(t);
+    var pct = Math.round(v * 100);
+    if (count) count.textContent = (pct < 10 ? '0' : '') + pct;
+    if (fill) fill.style.width = (v * 100) + '%';
+    if (t < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      if (count) count.textContent = '100';
+      // brief beat, then curtain wipe reveal
+      setTimeout(exit, reduce ? 80 : 280);
+    }
+  }
+
+  function exit() {
+    if (reduce) { reveal(); return; }
+    loader.classList.add('loader-exit');
+    var curtain = loader.querySelector('.loader-curtain');
+    var done = false;
+    function finish() { if (done) return; done = true; reveal(); }
+    if (curtain) curtain.addEventListener('animationend', finish, { once: true });
+    setTimeout(finish, 1400); // safety fallback
+  }
+
+  requestAnimationFrame(tick);
+})();
+
+
 // ── THEME TOGGLE ──
 const toggle = document.getElementById('themeToggle');
 const html = document.documentElement;

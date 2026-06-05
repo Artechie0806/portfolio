@@ -8,10 +8,38 @@
 <meta name="author" content="Aryan Rane">
 <title>Aryan Rane | Software Developer & AI/ML Engineer</title>
 <link rel="stylesheet" href="assets/css/style.css">
+<script>
+  // Set theme before first paint so the loader never flashes the wrong mode
+  (function () {
+    try {
+      if ((localStorage.getItem('theme') || 'light') === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    } catch (e) {}
+    document.documentElement.classList.add('loading');
+  })();
+</script>
+<style>
+  /* Critical: hold scroll while the loader is up */
+  html.loading, html.loading body { overflow: hidden; height: 100%; }
+</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
+
+<!-- ── PAGE LOADER ── -->
+<div id="loader" role="status" aria-label="Loading">
+  <div class="loader-inner">
+    <div class="loader-mark">AR<span>.</span></div>
+    <div class="loader-tagline">Software Developer&nbsp;&nbsp;/&nbsp;&nbsp;AI-ML Engineer</div>
+    <div class="loader-progress">
+      <div class="loader-bar"><span class="loader-bar-fill"></span></div>
+      <div class="loader-count">00</div>
+    </div>
+  </div>
+  <div class="loader-curtain"></div>
+</div>
 
 <!-- NAV -->
 <nav id="navbar">

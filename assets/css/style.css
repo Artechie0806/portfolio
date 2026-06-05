@@ -985,3 +985,139 @@
     .section-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
     .section-line { display: none; }
   }
+
+  /* ───────────────────────────────────────────
+     PAGE LOADER
+     ─────────────────────────────────────────── */
+  #loader {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: opacity 0.6s ease;
+  }
+  /* subtle film grain to match the site */
+  #loader::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .loader-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 2rem;
+  }
+
+  .loader-mark {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(4rem, 11vw, 7rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    line-height: 1;
+    opacity: 0;
+    transform: translateY(18px);
+    animation: loaderMarkIn 1s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+  }
+  .loader-mark span {
+    color: var(--accent-warm);
+    font-style: italic;
+    opacity: 0;
+    animation: loaderDotIn 0.5s ease 0.95s forwards;
+  }
+
+  .loader-tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(0.6rem, 1.6vw, 0.72rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-top: 1.4rem;
+    opacity: 0;
+    animation: loaderFadeIn 0.9s ease 0.55s forwards;
+  }
+
+  .loader-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2.6rem;
+    opacity: 0;
+    animation: loaderFadeIn 0.9s ease 0.8s forwards;
+  }
+  .loader-bar {
+    width: clamp(140px, 26vw, 240px);
+    height: 1px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .loader-bar-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0%;
+    background: var(--accent-warm);
+  }
+  .loader-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--accent-warm);
+    min-width: 2.4ch;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* curtain panel used for the exit wipe */
+  .loader-curtain {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform: translateY(100%);
+    z-index: 3;
+  }
+
+  /* EXIT: page revealed by an upward curtain wipe */
+  #loader.loader-exit .loader-inner { animation: loaderContentOut 0.45s ease forwards; }
+  #loader.loader-exit .loader-curtain { animation: curtainSweep 1.15s cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+  #loader.loader-done { opacity: 0; pointer-events: none; visibility: hidden; }
+
+  @keyframes loaderMarkIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes loaderDotIn {
+    0% { opacity: 0; transform: translateY(-6px); }
+    60% { opacity: 1; transform: translateY(2px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes loaderFadeIn {
+    to { opacity: 1; }
+  }
+  @keyframes loaderContentOut {
+    to { opacity: 0; transform: translateY(-14px); }
+  }
+  @keyframes curtainSweep {
+    0%   { transform: translateY(100%); }
+    45%  { transform: translateY(0%); }
+    55%  { transform: translateY(0%); }
+    100% { transform: translateY(-100%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loader-mark, .loader-mark span, .loader-tagline, .loader-progress { animation: none !important; opacity: 1 !important; transform: none !important; }
+    #loader.loader-exit .loader-curtain,
+    #loader.loader-exit .loader-inner { animation: none !important; }
+  }
+
