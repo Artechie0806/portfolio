@@ -752,10 +752,41 @@
   .achievement-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px var(--shadow); }
 
   .achievement-icon {
-    font-size: 2rem;
-    margin-bottom: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    margin-bottom: 1.1rem;
+    border: 1px solid var(--border);
+    background: var(--cream-dark);
+    color: var(--ink);
+    position: relative;
+    transition: color 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+  }
+  .achievement-icon::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 8px;
+    height: 8px;
+    border-top: 1px solid var(--accent-warm);
+    border-right: 1px solid var(--accent-warm);
+    opacity: 0.6;
+    transition: opacity 0.22s ease;
+  }
+  .achievement-icon svg {
+    width: 24px;
+    height: 24px;
     display: block;
   }
+  .achievement-card:hover .achievement-icon {
+    color: var(--accent-warm);
+    border-color: var(--accent-warm);
+    background: var(--cream);
+  }
+  .achievement-card:hover .achievement-icon::after { opacity: 1; }
   .achievement-category {
     font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
@@ -1121,3 +1152,146 @@
     #loader.loader-exit .loader-inner { animation: none !important; }
   }
 
+  /* ───────────────────────────────────────────
+     HERO NAME — KINETIC TYPOGRAPHY (replaces .hero-graphic)
+     ─────────────────────────────────────────── */
+  .name-motion {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    padding: 0.5rem 0 0.5rem 2.2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    user-select: none;
+  }
+  /* hairline rail down the left edge */
+  .name-motion::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: var(--border);
+  }
+  .name-motion::after {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: 6px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-warm);
+    animation: nmRail 6.4s ease-in-out infinite;
+  }
+
+  .nm-index {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 1.1rem;
+    opacity: 0;
+    animation: nmFadeLoop 6.4s ease-in-out infinite;
+  }
+
+  /* the whole line is the reveal mask; padding gives room for
+     descenders ('y') and italic overhang so glyphs aren't clipped */
+  .nm-line {
+    display: flex;
+    overflow: hidden;
+    line-height: 1.08;
+    padding: 0.14em 0.26em 0.62em;
+    margin-left: -0.26em;
+  }
+  .nm-l2 { margin-left: calc(1.6rem - 0.26em); }
+
+  /* letters slide up; the line-level mask hides them until revealed */
+  .nm-clip {
+    display: inline-block;
+    vertical-align: bottom;
+  }
+  .nm-char {
+    display: inline-block;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.4rem, 6vw, 5.4rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    transform: translateY(200%);
+    animation: nmCharLoop 6.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    animation-delay: var(--d);
+    will-change: transform;
+  }
+  /* second line italic + accent, echoing the static hero name treatment */
+  .nm-l2 .nm-char {
+    font-style: italic;
+    color: var(--accent-warm);
+  }
+
+  .nm-underline {
+    height: 2px;
+    width: 0;
+    background: var(--ink);
+    margin: 1.1rem 0 0 1.6rem;
+    transform-origin: left center;
+    animation: nmUnderline 6.4s ease-in-out infinite;
+  }
+
+  .nm-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin: 0.9rem 0 0 1.6rem;
+    opacity: 0;
+    animation: nmTag 6.4s ease-in-out infinite;
+  }
+
+  /* letters mask up, hold, then mask away — seamless loop */
+  @keyframes nmCharLoop {
+    0%   { transform: translateY(200%); }
+    9%   { transform: translateY(0); }
+    72%  { transform: translateY(0); }
+    82%  { transform: translateY(-160%); }
+    100% { transform: translateY(-160%); }
+  }
+  @keyframes nmUnderline {
+    0%, 22% { width: 0; opacity: 1; }
+    40%     { width: calc(100% - 1.6rem); opacity: 1; }
+    74%     { width: calc(100% - 1.6rem); opacity: 1; }
+    84%     { width: calc(100% - 1.6rem); opacity: 0; }
+    100%    { width: 0; opacity: 0; }
+  }
+  @keyframes nmFadeLoop {
+    0%, 6%  { opacity: 0; transform: translateY(6px); }
+    16%     { opacity: 1; transform: translateY(0); }
+    74%     { opacity: 1; transform: translateY(0); }
+    84%     { opacity: 0; transform: translateY(-4px); }
+    100%    { opacity: 0; }
+  }
+  @keyframes nmTag {
+    0%, 32% { opacity: 0; letter-spacing: 0.4em; }
+    46%     { opacity: 1; letter-spacing: 0.2em; }
+    74%     { opacity: 1; }
+    84%     { opacity: 0; }
+    100%    { opacity: 0; }
+  }
+  @keyframes nmRail {
+    0%   { transform: translateY(0); }
+    40%  { transform: translateY(calc(0.5px)); }
+    72%  { transform: translateY(140px); opacity: 1; }
+    84%  { transform: translateY(160px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nm-char { animation: none; transform: translateY(0); }
+    .nm-index, .nm-tag { animation: none; opacity: 1; }
+    .nm-underline { animation: none; width: calc(100% - 1.6rem); }
+    .name-motion::after { animation: none; }
+  }

@@ -17,7 +17,7 @@
   var fill = loader.querySelector('.loader-bar-fill');
   var count = loader.querySelector('.loader-count');
 
-  var COUNT_MS = reduce ? 500 : 1700; // count + fill duration
+  var COUNT_MS = reduce ? 500 : 3600; // count + fill duration (slow, deliberate fill)
   var start = null;
 
   function ease(t) { return 1 - Math.pow(1 - t, 3); } // easeOutCubic
@@ -34,7 +34,7 @@
     } else {
       if (count) count.textContent = '100';
       // brief beat, then curtain wipe reveal
-      setTimeout(exit, reduce ? 80 : 280);
+      setTimeout(exit, reduce ? 80 : 420);
     }
   }
 
