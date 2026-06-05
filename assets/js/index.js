@@ -3,10 +3,11 @@
 (function () {
   var loader = document.getElementById('loader');
   var root = document.documentElement;
-  if (!loader) { root.classList.remove('loading'); return; }
+  if (!loader) { root.classList.remove('loading'); root.classList.add('site-ready'); return; }
 
   function reveal() {
     root.classList.remove('loading');
+    root.classList.add('site-ready');
     loader.classList.add('loader-done');
     setTimeout(function () { if (loader && loader.parentNode) loader.parentNode.removeChild(loader); }, 700);
   }
