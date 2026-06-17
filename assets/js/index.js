@@ -2,14 +2,17 @@
 // ── PAGE LOADER ──
 (function () {
   var loader = document.getElementById('loader');
+  var curtain = document.querySelector('.loader-curtain');
   var root = document.documentElement;
   if (!loader) { root.classList.remove('loading'); root.classList.add('site-ready'); return; }
+
+  function remove(el) { if (el && el.parentNode) el.parentNode.removeChild(el); }
 
   function reveal() {
     root.classList.remove('loading');
     root.classList.add('site-ready');
-    loader.classList.add('loader-done');
-    setTimeout(function () { if (loader && loader.parentNode) loader.parentNode.removeChild(loader); }, 700);
+    remove(loader);
+    remove(curtain);
   }
 
   // Show the loader on every page load.
@@ -41,12 +44,21 @@
 
   function exit() {
     if (reduce) { reveal(); return; }
+    // bring the live site to life so it's already animating as the loader lifts away
+    root.classList.add('site-ready');
     loader.classList.add('loader-exit');
-    var curtain = loader.querySelector('.loader-curtain');
     var done = false;
-    function finish() { if (done) return; done = true; reveal(); }
-    if (curtain) curtain.addEventListener('animationend', finish, { once: true });
-    setTimeout(finish, 1400); // safety fallback
+    function finish(e) {
+      if (done) return;
+      if (e && e.target !== loader) return; // ignore animationend bubbling from inner content
+      done = true;
+      loader.removeEventListener('animationend', finish);
+      root.classList.remove('loading'); // unlock scroll once the loader has cleared
+      remove(loader);
+      remove(curtain);
+    }
+    loader.addEventListener('animationend', finish);
+    setTimeout(finish, 1600); // safety fallback (> 1.1s slide)
   }
 
   requestAnimationFrame(tick);
@@ -119,3 +131,97 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     if(target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
   });
 });
+
+// ── CUSTOM OVERLAY SCROLLBAR (appears on scroll/edge-hover, fades when idle, no layout space) ──
+(function () {
+  var track = document.createElement('div');
+  track.className = 'scrollbar-track';
+  track.setAttribute('aria-hidden', 'true');
+  var bar = document.createElement('div');
+  bar.className = 'scrollbar';
+  bar.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(track);
+  document.body.appendChild(bar);
+
+  var root = document.documentElement;
+  var hideTimer = null;
+  var dragging = false;
+  var EDGE = 24; // how close to the right edge counts as "the scrollbar area"
+
+  function maxScroll() { return root.scrollHeight - window.innerHeight; }
+
+  function setVisible(on) {
+    bar.classList.toggle('is-visible', on);
+    track.classList.toggle('is-visible', on);
+  }
+
+  function update() {
+    var max = maxScroll();
+    if (max <= 0) { bar.style.display = 'none'; return; } // nothing to scroll
+    bar.style.display = 'block';
+    var vh = window.innerHeight;
+    var thumbH = Math.max(vh * vh / root.scrollHeight, 40); // proportional, min 40px
+    var scrolled = window.scrollY || root.scrollTop;
+    bar.style.height = thumbH + 'px';
+    bar.style.transform = 'translateY(' + (scrolled / max) * (vh - thumbH) + 'px)';
+  }
+
+  function flash() {
+    setVisible(true);
+    if (hideTimer) clearTimeout(hideTimer);
+    if (!dragging) hideTimer = setTimeout(function () { setVisible(false); }, 700);
+  }
+
+  window.addEventListener('scroll', function () { update(); flash(); }, { passive: true });
+  window.addEventListener('resize', function () { update(); flash(); });
+  if (window.ResizeObserver) new ResizeObserver(update).observe(document.body);
+  window.addEventListener('load', update);
+  update();
+
+  // Reveal the bar when the pointer nears the right edge, so the track is reachable
+  window.addEventListener('mousemove', function (e) {
+    if (dragging || maxScroll() <= 0) return;
+    if (e.clientX >= window.innerWidth - EDGE) flash();
+  });
+  track.addEventListener('mouseenter', function () { if (hideTimer) clearTimeout(hideTimer); });
+  track.addEventListener('mouseleave', function () { flash(); });
+
+  // Click the track (but not the thumb) jumps the thumb to that spot
+  track.addEventListener('mousedown', function (e) {
+    if (e.target !== track) return;
+    var max = maxScroll();
+    if (max <= 0) return;
+    var thumbH = bar.offsetHeight;
+    var ratio = (e.clientY - thumbH / 2) / (window.innerHeight - thumbH);
+    ratio = Math.min(Math.max(ratio, 0), 1);
+    window.scrollTo({ top: ratio * max, behavior: 'smooth' });
+    flash();
+  });
+
+  // Drag the thumb to scroll
+  bar.addEventListener('mousedown', function (e) {
+    e.preventDefault();
+    dragging = true;
+    setVisible(true);
+    document.body.style.userSelect = 'none';
+    var prevBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto'; // instant tracking while dragging
+    var startY = e.clientY;
+    var startScroll = window.scrollY;
+    var range = window.innerHeight - bar.offsetHeight;
+
+    function move(ev) {
+      window.scrollTo(0, startScroll + ((ev.clientY - startY) / range) * maxScroll());
+    }
+    function up() {
+      dragging = false;
+      document.body.style.userSelect = '';
+      root.style.scrollBehavior = prevBehavior;
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+      flash();
+    }
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+  });
+})();
