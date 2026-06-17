@@ -216,7 +216,11 @@
 
   .hero-role {
     font-family: 'DM Mono', monospace;
-    font-size: 0.9rem;
+    /* Scales down on narrow screens so the line never wraps/overflows */
+    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+    /* Keep on one line so a web-font swap can't reflow 2 lines -> 1 line
+       and shift the elements below it */
+    white-space: nowrap;
     color: var(--ink-muted);
     margin-bottom: 2rem;
     letter-spacing: 0.05em;
