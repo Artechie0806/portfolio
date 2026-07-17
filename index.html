@@ -223,11 +223,10 @@
       <div class="skill-list">
         <span class="skill-pill">Python</span>
         <span class="skill-pill">Go</span>
-        <span class="skill-pill">PostgreSQL</span>
-        <span class="skill-pill">SQL</span>
-        <span class="skill-pill">Bash</span>
         <span class="skill-pill">Java</span>
         <span class="skill-pill">JavaScript</span>
+        <span class="skill-pill">SQL</span>
+        <span class="skill-pill">Bash</span>
       </div>
     </div>
 
@@ -241,8 +240,8 @@
         <span class="skill-pill">vLLM (Inference)</span>
         <span class="skill-pill">Vision Transformers</span>
         <span class="skill-pill">YOLO</span>
-        <span class="skill-pill">MediaPipe</span>
         <span class="skill-pill">OpenCV</span>
+        <span class="skill-pill">MediaPipe</span>
       </div>
     </div>
 
@@ -254,7 +253,6 @@
         <span class="skill-pill">Flask</span>
         <span class="skill-pill">Streamlit</span>
         <span class="skill-pill">Celery</span>
-        <span class="skill-pill">Redis</span>
         <span class="skill-pill">Pandas</span>
         <span class="skill-pill">NumPy</span>
       </div>
@@ -265,11 +263,12 @@
       <div class="skill-list">
         <span class="skill-pill">PostgreSQL</span>
         <span class="skill-pill">MySQL</span>
-        <span class="skill-pill">FAISS (Vector DB)</span>
-        <span class="skill-pill">Linux</span>
-        <span class="skill-pill">Docker</span>
-        <span class="skill-pill">Git</span>
         <span class="skill-pill">SQLite</span>
+        <span class="skill-pill">FAISS (Vector DB)</span>
+        <span class="skill-pill">Redis</span>
+        <span class="skill-pill">Docker</span>
+        <span class="skill-pill">Linux</span>
+        <span class="skill-pill">Git</span>
       </div>
     </div>
 
@@ -277,10 +276,10 @@
       <div class="skill-cat-title">Tools & Specialized</div>
       <div class="skill-list">
         <span class="skill-pill">Jupyter</span>
-        <span class="skill-pill">Selenium</span>
-        <span class="skill-pill">Postman</span>
         <span class="skill-pill">Weights & Biases</span>
         <span class="skill-pill">CUDA</span>
+        <span class="skill-pill">Postman</span>
+        <span class="skill-pill">Selenium</span>
       </div>
     </div>
   </div>
@@ -311,6 +310,23 @@
         </div>
         <div class="project-links">
             <a href="https://github.com/Artechie0806/AI-code-Documentation-and-QA" target="_blank" class="project-link">⌥ GitHub</a>
+        </div>
+    </div>
+
+    <div class="project-card reveal">
+        <div class="project-type">Multi-Agent LLM · Fact Verification · Local LLM · Full Stack</div>
+        <h3 class="project-title">Fact-Checked Research Agent</h3>
+        <p class="project-desc">A research agent that treats evidence as the product rather than the prose. It drafts atomic claims, then hands each one to a separate verifier that checks it against the source it cites — so every line of the report either carries a verbatim quote or is flagged as unsupported.</p>
+        <p class="project-problem">Problem: Agents that merely chain search APIs present fluent prose as fact — the same model that writes a claim also judges it, so hallucinations pass through unchallenged.</p>
+        <div class="project-stack">
+            <span class="stack-tag">Python</span><span class="stack-tag">FastAPI</span><span class="stack-tag">Qwen</span><span class="stack-tag">DuckDuckGo</span><span class="stack-tag">Trafilatura</span><span class="stack-tag">SSE</span>
+        </div>
+        <div class="project-results">
+            <strong>Results</strong>
+            Built a Researcher → Verifier → Orchestrator pipeline that isolates the fact-checker — it sees only a claim and its cited text, and must extract a supporting quote validated against the original. Every call runs inside a 16k-token budget; reports ship with grounding rate, verdict breakdown, and real token counts.
+        </div>
+        <div class="project-links">
+            <a href="https://github.com/Artechie0806/Research-Agent" target="_blank" class="project-link">⌥ GitHub</a>
         </div>
     </div>
 

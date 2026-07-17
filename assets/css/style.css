@@ -236,6 +236,47 @@
     margin-bottom: 3rem;
     opacity: 0;
     animation: fadeUp 0.9s 0.6s forwards;
+    position: relative;
+  }
+
+  /* ── HERO SUMMARY: TERMINAL-STYLE TYPING ──
+     Typography and colour stay exactly as above — only the entrance is
+     bash-like. JS builds .hs-ghost / .hs-type; without JS the plain
+     paragraph renders as normal. */
+
+  /* The real text at zero opacity. Reserves the paragraph's final height so
+     the CTA row below never jumps while the overlay types, and keeps the copy
+     available to screen readers, Ctrl+F, and text selection. */
+  .hs-ghost { color: transparent; }
+
+  /* The visible, progressively typed copy. Inherits every type property from
+     .hero-summary, so it wraps line-for-line onto the ghost beneath it.
+     Inert to the pointer so selecting the paragraph targets the ghost and
+     copies the text once, not twice. */
+  .hs-type {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Block cursor, drawn rather than typed, so it reads as a terminal caret
+     while the text itself stays DM Sans. currentColor = the paragraph's ink. */
+  .hs-caret {
+    display: inline-block;
+    width: 0.5em;
+    height: 1.05em;
+    margin-left: 0.06em;
+    vertical-align: -0.19em;
+    background: currentColor;
+  }
+  /* Solid while output is streaming, blinking once the line is done — the way
+     a real shell cursor behaves. */
+  .hs-caret.is-blinking { animation: hsCaret 1.06s step-end infinite; }
+
+  @keyframes hsCaret {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
   }
 
   .hero-cta {

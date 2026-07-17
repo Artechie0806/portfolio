@@ -65,6 +65,82 @@
 })();
 
 
+// ── HERO SUMMARY: TERMINAL-STYLE TYPING ──
+// Streams the summary out character by character once the loader curtain has
+// lifted, so the animation is actually seen rather than played behind it.
+(function () {
+  var p = document.querySelector('.hero-summary');
+  if (!p) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  // Source of truth is the markup, so the paragraph still renders (and indexes)
+  // without JS. Collapse the source's indentation to single spaces.
+  var text = p.textContent.replace(/\s+/g, ' ').trim();
+  if (!text) return;
+
+  var ghost = document.createElement('span');
+  ghost.className = 'hs-ghost';
+  ghost.textContent = text;
+
+  var type = document.createElement('span');
+  type.className = 'hs-type';
+  type.setAttribute('aria-hidden', 'true'); // the ghost is the accessible copy
+
+  var out = document.createElement('span');
+  var caret = document.createElement('span');
+  caret.className = 'hs-caret';
+  type.appendChild(out);
+  type.appendChild(caret);
+
+  p.textContent = '';
+  p.appendChild(ghost);
+  p.appendChild(type);
+
+  // Output streams at a steady character rate, driven off rAF rather than a
+  // per-character setTimeout: frame-synced and drift-corrected, so the line
+  // reads as smooth output instead of a stuttering timer. The only breaks in
+  // cadence are short settles at punctuation.
+  var CPS = 65;                                   // characters per second
+  var HOLD = { '.': 150, ',': 80, '—': 80 };      // ms settle after these
+  var MAX_DT = 100;                               // clamp catch-up after a tab switch
+
+  var i = 0, prev = null, credit = 0, hold = 0;
+
+  function frame(ts) {
+    if (prev === null) prev = ts;
+    var dt = Math.min(ts - prev, MAX_DT);
+    prev = ts;
+
+    if (hold > 0) { hold -= dt; requestAnimationFrame(frame); return; }
+
+    // Fractional carry keeps the rate honest across uneven frame durations.
+    credit += dt * (CPS / 1000);
+    var n = Math.floor(credit);
+    if (n > 0) {
+      credit -= n;
+      i = Math.min(i + n, text.length);
+      out.textContent = text.slice(0, i);
+      hold = HOLD[text.charAt(i - 1)] || 0;
+    }
+
+    if (i >= text.length) { caret.classList.add('is-blinking'); return; }
+    requestAnimationFrame(frame);
+  }
+
+  var root = document.documentElement;
+  // Beat after the curtain clears, then stream.
+  function start() { setTimeout(function () { requestAnimationFrame(frame); }, 260); }
+
+  if (root.classList.contains('site-ready')) { start(); return; }
+  var mo = new MutationObserver(function () {
+    if (!root.classList.contains('site-ready')) return;
+    mo.disconnect();
+    start();
+  });
+  mo.observe(root, { attributes: true, attributeFilter: ['class'] });
+})();
+
+
 // ── THEME TOGGLE ──
 const toggle = document.getElementById('themeToggle');
 const html = document.documentElement;
