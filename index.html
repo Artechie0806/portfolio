@@ -331,6 +331,23 @@
     </div>
 
     <div class="project-card reveal">
+        <div class="project-type">Multi-Agent LLM · Text-to-SQL · Data Visualization · Full Stack</div>
+        <h3 class="project-title">DataScribe - Conversational Data Analyst</h3>
+        <p class="project-desc">Upload any spreadsheet, CSV, or SQLite file and talk to it. DataScribe turns the file into a DuckDB warehouse, works out what every column means by measuring it, and answers questions in conversation — with a live chart whenever a chart says it better than a sentence.</p>
+        <p class="project-problem">Problem: Text-to-SQL tools assume a curated database and a hand-written data dictionary — pointed at an arbitrary uploaded file, they guess at column meanings and return confident wrong numbers.</p>
+        <div class="project-stack">
+            <span class="stack-tag">Python</span><span class="stack-tag">FastAPI</span><span class="stack-tag">DuckDB</span><span class="stack-tag">Qwen</span><span class="stack-tag">SVG Charts</span><span class="stack-tag">NDJSON Streaming</span>
+        </div>
+        <div class="project-results">
+            <strong>Results</strong>
+            Built a seven-agent pipeline (Router → SQL author → critic → chart agent → narrator) over a two-pass profiler that derives every table's grain, column roles, joins, and quality flags at upload — no data dictionary. Model-authored SQL runs read-only behind a statement guard with row caps and timeouts, and every chart is deterministically reconciled against the actual result before rendering.
+        </div>
+        <div class="project-links">
+            <a href="https://github.com/Artechie0806/Datascripe" target="_blank" class="project-link">⌥ GitHub</a>
+        </div>
+    </div>
+
+    <div class="project-card reveal">
         <div class="project-type">AI · Vision Transformer · Medical Imaging</div>
         <h3 class="project-title">Brain Stroke Detection</h3>
         <p class="project-desc">A real-time diagnostic application utilizing Vision Transformers (ViT) to identify stroke indicators in medical scans.</p>
