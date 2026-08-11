@@ -1486,3 +1486,242 @@
     #hero { grid-template-columns: 1fr; }
     .hero-right { display: none; }
   }
+
+  /* ───────────────────────────────────────────
+     GLASS MORPHISM
+     Frosted surfaces over an ambient colour field.
+     Blur alone reads as nothing on a flat ground —
+     so the sections go translucent and a fixed field
+     of soft warm/green washes sits behind them. The
+     field doesn't scroll, the content does, which is
+     where most of the movement comes from for free.
+     ─────────────────────────────────────────── */
+
+  :root {
+    --glass-blur: 20px;
+    --glass-sat: 170%;
+    --glass-r: 6px;      /* just enough curve to read as glass, not enough to
+                            soften the square editorial feel */
+    --glass-r-sm: 3px;
+
+    /* ── HOW SEE-THROUGH IT IS ──
+       Three alphas stack between the eye and the colour field:
+         ambient field → --surface (the section) → --glass-bg (the panel) → text
+       A panel sits on its section, so dropping --glass-bg alone just reveals more
+       opaque section. To open the glass up, lower --surface AND --glass-bg together;
+       to close it down, raise both. Everything else here is trim.
+       Legibility floor: much below 0.30 on --surface the ambient wash starts to
+       tint body copy. */
+
+    /* Section grounds — translucent so the ambient field bleeds through */
+    --surface:     rgba(245,240,232,0.52);
+    --surface-alt: rgba(233,227,214,0.46);
+
+    /* The glass itself. Warm white, not pure white, so it stays in the
+       cream palette instead of reading as a foreign blue-grey sheet. */
+    --glass-bg:     rgba(255,252,245,0.32);
+    --glass-bg-hi:  rgba(255,252,245,0.46);
+    --glass-chip:   rgba(255,252,245,0.38);
+    --glass-border: rgba(255,255,255,0.65);
+    --glass-edge:   rgba(255,255,255,0.90);  /* inset top highlight — the lit edge */
+    --glass-sheen:  rgba(255,255,255,0.50);  /* pointer-tracked light spot */
+    --glass-ring:   rgba(26,24,20,0.07);
+    --glass-shadow: rgba(26,24,20,0.10);
+    --glass-nav:    rgba(245,240,232,0.45);
+    --glass-nav-on: rgba(245,240,232,0.66);
+
+    --blob-a: rgba(199,142,82,0.30);
+    --blob-b: rgba(107,136,104,0.24);
+    --blob-c: rgba(196,113,74,0.22);
+    --blob-d: rgba(200,184,154,0.34);
+  }
+
+  [data-theme="dark"] {
+    --surface:     rgba(26,24,20,0.50);
+    --surface-alt: rgba(34,32,24,0.42);
+
+    --glass-bg:     rgba(78,73,60,0.22);
+    --glass-bg-hi:  rgba(90,84,69,0.32);
+    --glass-chip:   rgba(78,73,60,0.22);
+    --glass-border: rgba(245,240,232,0.13);
+    --glass-edge:   rgba(245,240,232,0.16);
+    --glass-sheen:  rgba(245,240,232,0.13);
+    --glass-ring:   rgba(0,0,0,0.30);
+    --glass-shadow: rgba(0,0,0,0.34);
+    --glass-nav:    rgba(26,24,20,0.44);
+    --glass-nav-on: rgba(26,24,20,0.62);
+
+    /* Dark needs a stronger field than light: the same alphas over near-black
+       read as flat grey, and there's less headroom before text loses contrast. */
+    --blob-a: rgba(199,142,82,0.26);
+    --blob-b: rgba(107,136,104,0.22);
+    --blob-c: rgba(196,113,74,0.20);
+    --blob-d: rgba(200,184,154,0.16);
+  }
+
+  /* Ambient field. Fixed and static: the canvas background paints first, so a
+     z-index:-1 pseudo-element on <body> lands above it and below every section. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: -15vmax;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(36vmax 36vmax at 14% 16%, var(--blob-a), transparent 60%),
+      radial-gradient(32vmax 32vmax at 86% 24%, var(--blob-b), transparent 62%),
+      radial-gradient(40vmax 40vmax at 72% 78%, var(--blob-c), transparent 64%),
+      radial-gradient(30vmax 30vmax at 22% 82%, var(--blob-d), transparent 60%);
+  }
+
+  /* Sections let the field through instead of sealing it off */
+  #projects, #experience, #resume { background: var(--surface); }
+  #about, #skills, #achievements, #contact { background: var(--surface-alt); }
+
+  /* ── Frosted panels ── */
+  .project-card,
+  .skill-category,
+  .achievement-card,
+  .about-sidebar,
+  .resume-box,
+  .timeline-content,
+  .nav-links.open {
+    position: relative;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-r);
+    box-shadow:
+      0 1px 2px var(--glass-ring),
+      0 10px 30px -14px var(--glass-shadow),
+      inset 0 1px 0 var(--glass-edge);
+    isolation: isolate;  /* keeps the sheen layer above the panel, below the text */
+  }
+
+  .about-sidebar { padding: 1.75rem; }
+  .timeline-content { padding: 1.1rem 1.25rem; margin-top: 0.9rem; }
+
+  /* Light spot. Sits at the top-centre by default and follows the pointer once
+     JS is running — so hover still works with scripting off. */
+  .project-card::after,
+  .skill-category::after,
+  .achievement-card::after,
+  .about-sidebar::after,
+  .resume-box::after,
+  .timeline-content::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(circle 220px at var(--mx, 50%) var(--my, 0%),
+                                var(--glass-sheen), transparent 62%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .project-card:hover::after,
+  .skill-category:hover::after,
+  .achievement-card:hover::after,
+  .about-sidebar:hover::after,
+  .resume-box:hover::after,
+  .timeline-content:hover::after { opacity: 1; }
+
+  .project-card:hover,
+  .achievement-card:hover {
+    background: var(--glass-bg-hi);
+    border-color: var(--glass-border);
+    box-shadow:
+      0 1px 2px var(--glass-ring),
+      0 22px 48px -20px var(--glass-shadow),
+      inset 0 1px 0 var(--glass-edge);
+  }
+
+  /* ── Frosted chips ── no backdrop-filter here: there are dozens of them and
+     they already sit on glass, so translucency alone carries the effect. */
+  .spec-tag,
+  .skill-pill,
+  .stack-tag,
+  .timeline-badge,
+  .project-link,
+  .btn-outline,
+  .contact-link-icon {
+    background: var(--glass-chip);
+    border-color: var(--glass-border);
+    border-radius: var(--glass-r-sm);
+    box-shadow: inset 0 1px 0 var(--glass-edge);
+  }
+
+  .achievement-icon {
+    background: var(--glass-chip);
+    border-color: var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-edge);
+  }
+  .achievement-card:hover .achievement-icon { background: var(--glass-bg-hi); }
+
+  .theme-toggle {
+    background: var(--glass-chip);
+    border-color: var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-edge);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  /* ── Nav: the one place the blur does real work, with body text passing under it ── */
+  nav,
+  [data-theme="dark"] nav {
+    background: var(--glass-nav);
+    -webkit-backdrop-filter: blur(18px) saturate(var(--glass-sat));
+    backdrop-filter: blur(18px) saturate(var(--glass-sat));
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: 0 1px 0 var(--glass-ring);
+    transition: background 0.4s ease, box-shadow 0.35s ease;
+  }
+  /* Denser once you're off the hero, so it holds against busier content */
+  nav.is-scrolled {
+    background: var(--glass-nav-on);
+    box-shadow: 0 1px 0 var(--glass-ring), 0 10px 30px -18px var(--glass-shadow);
+  }
+
+  /* Mobile nav panel drops as a frosted sheet */
+  @media (max-width: 900px) {
+    :root { --glass-blur: 5px; }  /* cheaper on mobile GPUs */
+    .nav-links.open,
+    [data-theme="dark"] .nav-links.open {
+      background: var(--glass-nav-on);
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+    }
+  }
+
+  /* Where backdrop-filter isn't supported, the same tokens go near-opaque —
+     no separate rule set, just denser values. */
+  @supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+    :root {
+      --surface: #F5F0E8;
+      --surface-alt: #EDE8DC;
+      --glass-bg: rgba(255,252,245,0.94);
+      --glass-bg-hi: rgba(255,255,255,0.97);
+      --glass-nav: rgba(245,240,232,0.97);
+      --glass-nav-on: rgba(245,240,232,0.99);
+    }
+    [data-theme="dark"] {
+      --surface: #1A1814;
+      --surface-alt: #222018;
+      --glass-bg: rgba(48,45,37,0.95);
+      --glass-bg-hi: rgba(56,52,43,0.97);
+      --glass-nav: rgba(26,24,20,0.97);
+      --glass-nav-on: rgba(26,24,20,0.99);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-card::after,
+    .skill-category::after,
+    .achievement-card::after,
+    .about-sidebar::after,
+    .resume-box::after,
+    .timeline-content::after { transition: none; }
+  }

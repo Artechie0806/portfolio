@@ -165,10 +165,10 @@
       <div class="timeline-content">
         <p>Architecting and maintaining high-throughput inference systems for Large Language Models.</p>
         <div class="timeline-achievements">
-          <span class="achievement-point">Resolved high inferencing cost by deploying Qwen32-VL-32-Instruct (8bit quantized), the setup on 96GB VRAM machine resulted in a ~150 TPS (Tokens per seconds) throughput resulting in ~60% cost cut with control over infra.</span>
-          <span class="achievement-point">Encapsulated YOLOv11 model to battle traditional Transformer architecture limitation, leading to 94% accuracy in checkbox detection.</span>
-          <span class="achievement-point">Resolved image orientation bottleneck by training custom ResNet150 model resulting in 1800+ images per hour of throughput with 97% of accuracy.</span>
-          <span class="achievement-point">Swept messy addresses by harnessing Gemini Flash 2.5, resulting in reduction in time by 90% and saving cost by 27,000$.</span>
+          <span class="achievement-point">Cut inference cost by self-hosting Qwen3.6-27B-Instruct (8-bit quantized) on a 96GB VRAM machine, sustaining ~150 tokens/second throughput — a ~60% cost reduction with full control over the infrastructure.</span>
+          <span class="achievement-point">Replaced a general vision-transformer pass with a task-specific YOLOv11 detector for checkbox extraction, reaching 94% detection accuracy at a fraction of the inference cost.</span>
+          <span class="achievement-point">Resolved an image-orientation bottleneck by training a custom ResNet-152 classifier, sustaining 1,800+ images/hour at 97% accuracy.</span>
+          <span class="achievement-point">Normalised messy free-text addresses using Gemini 2.5 Flash, reducing processing time by 90% and saving ~$27,000.</span>
         </div>
       </div>
     </div>
@@ -222,7 +222,6 @@
       <div class="skill-cat-title">Programming Languages</div>
       <div class="skill-list">
         <span class="skill-pill">Python</span>
-        <span class="skill-pill">Go</span>
         <span class="skill-pill">Java</span>
         <span class="skill-pill">JavaScript</span>
         <span class="skill-pill">SQL</span>
@@ -234,7 +233,7 @@
       <div class="skill-cat-title">AI / ML Ecosystem</div>
       <div class="skill-list">
         <span class="skill-pill">PyTorch</span>
-        <span class="skill-pill">TensorFlow</span>
+        <span class="skill-pill">TensorFlow / Keras</span>
         <span class="skill-pill">Scikit-learn</span>
         <span class="skill-pill">HuggingFace</span>
         <span class="skill-pill">vLLM (Inference)</span>
@@ -252,7 +251,6 @@
         <span class="skill-pill">Django</span>
         <span class="skill-pill">Flask</span>
         <span class="skill-pill">Streamlit</span>
-        <span class="skill-pill">Celery</span>
         <span class="skill-pill">Pandas</span>
         <span class="skill-pill">NumPy</span>
       </div>
@@ -262,10 +260,9 @@
       <div class="skill-cat-title">Infrastructure & Databases</div>
       <div class="skill-list">
         <span class="skill-pill">PostgreSQL</span>
-        <span class="skill-pill">MySQL</span>
+        <span class="skill-pill">DuckDB</span>
         <span class="skill-pill">SQLite</span>
-        <span class="skill-pill">FAISS (Vector DB)</span>
-        <span class="skill-pill">Redis</span>
+        <span class="skill-pill">ChromaDB (Vector DB)</span>
         <span class="skill-pill">Docker</span>
         <span class="skill-pill">Linux</span>
         <span class="skill-pill">Git</span>
@@ -276,10 +273,9 @@
       <div class="skill-cat-title">Tools & Specialized</div>
       <div class="skill-list">
         <span class="skill-pill">Jupyter</span>
-        <span class="skill-pill">Weights & Biases</span>
+        <span class="skill-pill">Ollama</span>
         <span class="skill-pill">CUDA</span>
         <span class="skill-pill">Postman</span>
-        <span class="skill-pill">Selenium</span>
       </div>
     </div>
   </div>
@@ -295,40 +291,6 @@
 
   <div class="project-category-label">⬡ &nbsp; AI / Machine Learning Projects</div>
   <div class="projects-grid">
-
-    <div class="project-card reveal">
-        <div class="project-type">Agentic RAG · Voice AI · Local LLM · Full Stack</div>
-        <h3 class="project-title">Local Voice RAG Assistant</h3>
-        <p class="project-desc">A fully local, private assistant that answers questions about your own documents by voice or text — grounded in your files with citations, and read back in a natural neural voice. No data leaves the machine and no API keys.</p>
-        <p class="project-problem">Problem: Cloud Q&A tools expose private documents and depend on API keys, while small local models misfire on tool calls and hallucinate answers.</p>
-        <div class="project-stack">
-            <span class="stack-tag">LangGraph</span><span class="stack-tag">Ollama</span><span class="stack-tag">ChromaDB</span><span class="stack-tag">FastAPI</span><span class="stack-tag">Whisper</span><span class="stack-tag">Piper TTS</span><span class="stack-tag">Pipecat</span>
-        </div>
-        <div class="project-results">
-            <strong>Results</strong>
-            Engineered a RAG-first agent (hybrid dense + BM25 retrieval, MMR, multi-query expansion) serving identical behaviour across three front-ends — text, voice, and web — fully offline with real-time barge-in voice and inline source citations.
-        </div>
-        <div class="project-links">
-            <a href="https://github.com/Artechie0806/Voice-Document-RAG" target="_blank" class="project-link">⌥ GitHub</a>
-        </div>
-    </div>
-
-    <div class="project-card reveal">
-        <div class="project-type">Multi-Agent LLM · Fact Verification · Local LLM · Full Stack</div>
-        <h3 class="project-title">Fact-Checked Research Agent</h3>
-        <p class="project-desc">A research agent that treats evidence as the product rather than the prose. It drafts atomic claims, then hands each one to a separate verifier that checks it against the source it cites — so every line of the report either carries a verbatim quote or is flagged as unsupported.</p>
-        <p class="project-problem">Problem: Agents that merely chain search APIs present fluent prose as fact — the same model that writes a claim also judges it, so hallucinations pass through unchallenged.</p>
-        <div class="project-stack">
-            <span class="stack-tag">Python</span><span class="stack-tag">FastAPI</span><span class="stack-tag">Qwen</span><span class="stack-tag">DuckDuckGo</span><span class="stack-tag">Trafilatura</span><span class="stack-tag">SSE</span>
-        </div>
-        <div class="project-results">
-            <strong>Results</strong>
-            Built a Researcher → Verifier → Orchestrator pipeline that isolates the fact-checker — it sees only a claim and its cited text, and must extract a supporting quote validated against the original. Every call runs inside a 16k-token budget; reports ship with grounding rate, verdict breakdown, and real token counts.
-        </div>
-        <div class="project-links">
-            <a href="https://github.com/Artechie0806/Research-Agent" target="_blank" class="project-link">⌥ GitHub</a>
-        </div>
-    </div>
 
     <div class="project-card reveal">
         <div class="project-type">Multi-Agent LLM · Text-to-SQL · Data Visualization · Full Stack</div>
@@ -348,16 +310,50 @@
     </div>
 
     <div class="project-card reveal">
-        <div class="project-type">AI · Vision Transformer · Medical Imaging</div>
-        <h3 class="project-title">Brain Stroke Detection</h3>
-        <p class="project-desc">A real-time diagnostic application utilizing Vision Transformers (ViT) to identify stroke indicators in medical scans.</p>
-        <p class="project-problem">Problem: Traditional CNNs can sometimes struggle with global context in complex medical images, leading to lower sensitivity.</p>
+        <div class="project-type">Multi-Agent LLM · Fact Verification · Local LLM · Full Stack</div>
+        <h3 class="project-title">Fact-Checked Research Agent</h3>
+        <p class="project-desc">A research agent that treats evidence as the product rather than the prose. It drafts atomic claims, then hands each one to a separate verifier that checks it against the source it cites — so every line of the report either carries a verbatim quote or is flagged as unsupported.</p>
+        <p class="project-problem">Problem: Agents that merely chain search APIs present fluent prose as fact — the same model that writes a claim also judges it, so hallucinations pass through unchallenged.</p>
         <div class="project-stack">
-            <span class="stack-tag">ViT-B16</span><span class="stack-tag">PyTorch</span><span class="stack-tag">HuggingFace</span><span class="stack-tag">Streamlit</span><span class="stack-tag">OpenCV</span>
+            <span class="stack-tag">Python</span><span class="stack-tag">FastAPI</span><span class="stack-tag">Qwen</span><span class="stack-tag">DuckDuckGo</span><span class="stack-tag">Trafilatura</span><span class="stack-tag">SSE</span>
         </div>
         <div class="project-results">
             <strong>Results</strong>
-            Achieved 90%+ classification accuracy; demonstrated superior performance and interpretability over standard CNN architectures.
+            Built a Researcher → Verifier → Orchestrator pipeline that isolates the fact-checker — it sees only a claim and its cited text, and must extract a supporting quote that is then located in the original by string search, with the verdict downgraded automatically when it isn't found. Every call runs inside a 16k-token budget; reports ship with grounding rate, verdict breakdown, and real token counts.
+        </div>
+        <div class="project-links">
+            <a href="https://github.com/Artechie0806/Research-Agent" target="_blank" class="project-link">⌥ GitHub</a>
+        </div>
+    </div>
+
+    <div class="project-card reveal">
+        <div class="project-type">RAG · AST Chunking · Local LLM · Vector Search</div>
+        <h3 class="project-title">AI Code Documentation & QA</h3>
+        <p class="project-desc">Points a local LLM at a repository, splits it along the syntax tree rather than by character count, summarises every class and function, indexes them for semantic search, and writes the summaries back into the source as real docstrings.</p>
+        <p class="project-problem">Problem: Fixed-size chunking cuts a function in half and both halves become useless for retrieval — and raw code is identifiers, not prose, so an English question never lands near it in embedding space.</p>
+        <div class="project-stack">
+            <span class="stack-tag">Python</span><span class="stack-tag">AST</span><span class="stack-tag">Ollama</span><span class="stack-tag">ChromaDB</span><span class="stack-tag">nomic-embed-text</span><span class="stack-tag">FastAPI</span><span class="stack-tag">Streamlit</span>
+        </div>
+        <div class="project-results">
+            <strong>Results</strong>
+            Every chunk is a complete class, function, or method carrying its file path, line range, parent class, and imports. The embedded text pairs an LLM-written summary with the source, closing the vocabulary gap between a plain-English question and a code corpus. Docstring injection runs bottom-to-top so line numbers stay valid as text is inserted, and skips symbols that already have a docstring — so re-running is idempotent.
+        </div>
+        <div class="project-links">
+            <a href="https://github.com/Artechie0806/AI-code-Documentation-and-QA" target="_blank" class="project-link">⌥ GitHub</a>
+        </div>
+    </div>
+
+    <div class="project-card reveal">
+        <div class="project-type">AI · Vision Transformer · Medical Imaging</div>
+        <h3 class="project-title">Brain Stroke Detection</h3>
+        <p class="project-desc">Binary stroke classification on brain CT scans using ViT-B/16 fine-tuned from ImageNet weights, served through a Flask app that returns a label and a probability for an uploaded scan.</p>
+        <p class="project-problem">Problem: Stroke signal is often a subtle asymmetry between hemispheres — a comparison across distant regions. Self-attention gives every patch a global receptive field in the first layer, where a CNN has to build that context up through stacked local convolutions.</p>
+        <div class="project-stack">
+            <span class="stack-tag">ViT-B/16</span><span class="stack-tag">vit_keras</span><span class="stack-tag">TensorFlow/Keras</span><span class="stack-tag">Flask</span><span class="stack-tag">OpenCV</span>
+        </div>
+        <div class="project-results">
+            <strong>Results</strong>
+            ~90% classification accuracy on the held-out set. Read that number with a caveat I'd rather state than hide: the split wasn't grouped by patient, and a CT study contributes many near-identical slices, so the figure is likely optimistic until it's re-run with patient-level grouping and reported as sensitivity/specificity — the right framing for a screening task where a false negative costs far more than a false positive.
         </div>
         <div class="project-links">
             <a href="https://github.com/Artechie0806/Brain-Stroke-Classification.git" target="_blank" class="project-link">⌥ GitHub</a>
@@ -367,14 +363,14 @@
     <div class="project-card reveal">
         <div class="project-type">Machine Learning · Data Science · Space Tech</div>
         <h3 class="project-title">Hazardous Asteroid Detection</h3>
-        <p class="project-desc">A predictive model trained on NASA dataset records to identify Near-Earth Objects (NEOs) that pose a potential threat.</p>
-        <p class="project-problem">Problem: Identifying hazardous objects within massive datasets (958k+ records) requires high precision to filter out non-threats.</p>
+        <p class="project-desc">A Random Forest trained on NASA JPL's small-body dataset to flag Near-Earth Objects classified as potentially hazardous — and a worked example of why a near-perfect score is a warning, not a result.</p>
+        <p class="project-problem">Problem: The model scored 99.99% accuracy and a ROC-AUC of exactly 1.0. That's target leakage: a PHA is <em>defined</em> as MOID ≤ 0.05 AU with absolute magnitude H ≤ 22, and two of the five features were MOID (in lunar distances) and H — so the label was a deterministic threshold over the inputs.</p>
         <div class="project-stack">
             <span class="stack-tag">Python</span><span class="stack-tag">Random Forest</span><span class="stack-tag">Scikit-Learn</span><span class="stack-tag">Pandas</span><span class="stack-tag">Kaggle API</span>
         </div>
         <div class="project-results">
             <strong>Results</strong>
-            Reached 94.7% prediction accuracy; successfully preprocessed and cleaned a massive dataset of 958,000+ records.
+            Documented the leakage rather than the headline number, along with two related findings: dropping rows with missing diameter took 958k raw records down to ~132k and biased the sample toward well-observed objects, and with 60 positives in a 39,614-row test set, accuracy sits 0.14 points above a model that predicts "not hazardous" for everything. The honest version predicts from orbital elements alone and scores far lower.
         </div>
         <div class="project-links">
             <a href="https://github.com/Artechie0806/Asteroid-prediction.git" target="_blank" class="project-link">⌥ GitHub</a>
@@ -384,14 +380,14 @@
     <div class="project-card reveal">
         <div class="project-type">Deep Learning · Computer Vision · Healthcare</div>
         <h3 class="project-title">MURA X-Ray Classification</h3>
-        <p class="project-desc">A deep learning pipeline designed to detect musculoskeletal abnormalities in X-ray images using state-of-the-art architectures.</p>
-        <p class="project-problem">Problem: Manual radiological interpretation is time-consuming and prone to human fatigue, requiring automated triage tools.</p>
+        <p class="project-desc">EfficientNetB0 transfer learning on Stanford's MURA dataset — 36,808 musculoskeletal radiographs — to flag abnormal studies for triage.</p>
+        <p class="project-problem">Problem: Manual radiological interpretation is slow and fatigue-prone, and MURA is labelled at the study level, so evaluating it honestly is harder than training it.</p>
         <div class="project-stack">
-            <span class="stack-tag">Python</span><span class="stack-tag">EfficientNetB0</span><span class="stack-tag">TensorFlow/PyTorch</span><span class="stack-tag">Transfer Learning</span><span class="stack-tag">Data Augmentation</span>
+            <span class="stack-tag">Python</span><span class="stack-tag">EfficientNetB0</span><span class="stack-tag">TensorFlow/Keras</span><span class="stack-tag">Transfer Learning</span><span class="stack-tag">Focal Loss</span>
         </div>
         <div class="project-results">
             <strong>Results</strong>
-            Achieved 85%+ validation accuracy on the MURA dataset; streamlined the preprocessing pipeline for large-scale medical imaging.
+            ~64% accuracy on MURA's official, patient-disjoint validation set with the base frozen. Full fine-tuning scored 85%, but on a StratifiedKFold split of the <em>training</em> set taken at image level — MURA has roughly three images per study, so the same study lands on both sides. Recorded as a split-integrity failure rather than reported as the headline; the fix is GroupKFold on patient id. Class weighting, focal loss, threshold sweeping, and PR curves throughout.
         </div>
         <div class="project-links">
             <a href="https://github.com/Artechie0806/MURA-X-Ray-Classification-Efficientnet-.git" target="_blank" class="project-link">⌥ GitHub</a>
@@ -408,7 +404,7 @@
         </div>
         <div class="project-results">
             <strong>Results</strong>
-            Developed a 5-level enemy wave system with dynamic scoring; achieved fluid, real-time control with minimal input lag.
+            Maps 21 MediaPipe hand landmarks to real-time control: the middle-finger knuckle drives ship position because it stays steadier than the wrist under rotation, and a fingertip dropping below that knuckle fires. The capture is mirrored so movement reads intuitively. Six-enemy wave with random respawn and dynamic scoring.
         </div>
         <div class="project-links">
             <a href="https://github.com/Artechie0806/space-invader-using-hand-detection.git" target="_blank" class="project-link">⌥ GitHub</a>
@@ -416,50 +412,6 @@
     </div>
 
   </div>
-  
-  <!--<div class="project-category-label">⬡ &nbsp; Software / Full Stack Projects</div>
-  <div class="projects-grid">
-
-    <div class="project-card reveal">
-      <div class="project-type">Full Stack · Web App</div>
-      <h3 class="project-title">Task & Project Management App</h3>
-      <p class="project-desc">A full-stack productivity application with real-time collaboration, drag-and-drop kanban boards, and team role management built with the MERN stack.</p>
-      <p class="project-problem">Problem: Teams needed a lightweight, customizable alternative to heavyweight project management tools.</p>
-      <div class="project-stack">
-        <span class="stack-tag">React</span><span class="stack-tag">Node.js</span><span class="stack-tag">Express</span><span class="stack-tag">MongoDB</span><span class="stack-tag">Socket.io</span><span class="stack-tag">JWT</span>
-      </div>
-      <div class="project-links">
-        <a href="https://github.com/Artechie0806" target="_blank" class="project-link">⌥ GitHub</a>
-      </div>
-    </div>
-
-    <div class="project-card reveal">
-      <div class="project-type">Backend · REST API</div>
-      <h3 class="project-title">E-Commerce Backend API</h3>
-      <p class="project-desc">Scalable REST API for an e-commerce platform with features including product management, order processing, user authentication, and payment integration.</p>
-      <p class="project-problem">Problem: Needed a modular, well-documented backend service for a growing online retail platform.</p>
-      <div class="project-stack">
-        <span class="stack-tag">Python</span><span class="stack-tag">Django REST</span><span class="stack-tag">PostgreSQL</span><span class="stack-tag">Redis</span><span class="stack-tag">Celery</span><span class="stack-tag">Stripe API</span>
-      </div>
-      <div class="project-links">
-        <a href="https://github.com/Artechie0806" target="_blank" class="project-link">⌥ GitHub</a>
-      </div>
-    </div>
-
-    <div class="project-card reveal">
-      <div class="project-type">Data · Dashboard</div>
-      <h3 class="project-title">Real-Time Analytics Dashboard</h3>
-      <p class="project-desc">An interactive data visualization dashboard pulling live data streams, featuring dynamic charts, filters, and automated reporting capabilities.</p>
-      <p class="project-problem">Problem: Business stakeholders needed accessible, real-time KPI visibility without manual reporting overhead.</p>
-      <div class="project-stack">
-        <span class="stack-tag">React</span><span class="stack-tag">D3.js</span><span class="stack-tag">FastAPI</span><span class="stack-tag">WebSockets</span><span class="stack-tag">ClickHouse</span>
-      </div>
-      <div class="project-links">
-        <a href="https://github.com/Artechie0806" target="_blank" class="project-link">⌥ GitHub</a>
-      </div>
-    </div>
-
-  </div> -->
 </section>
 
 <!-- ACHIEVEMENTS -->
@@ -569,31 +521,6 @@
       </a>
     </div>
   </div>
-    <!--<div class="reveal">
-      <form class="contact-form" onsubmit="handleFormSubmit(event)">
-        <div class="form-group">
-          <label for="name">Name</label>
-          <input type="text" id="name" name="name" placeholder="Your name" required>
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="your@email.com" required>
-        </div>
-        <div class="form-group">
-          <label for="subject">Subject</label>
-          <input type="text" id="subject" name="subject" placeholder="What's this about?">
-        </div>
-        <div class="form-group">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" placeholder="Tell me about your project or opportunity..." required></textarea>
-        </div>
-        <button type="submit" class="btn-primary" id="submitBtn" style="align-self:flex-start;">
-          Send Message →
-        </button>
-        <p id="formMsg" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--accent-green);display:none;letter-spacing:0.05em;"></p>
-      </form>
-    </div>
-  </div>-->
 </section>
 
 <!-- FOOTER -->
