@@ -208,51 +208,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
-// ── GLASS: POINTER-TRACKED SHEEN ──
-// Moves the light spot on each frosted panel to follow the cursor. CSS already
-// renders the sheen at a fixed default position on hover, so this is purely an
-// enhancement — with JS off, the panels still light up, just not directionally.
-(function () {
-  var panels = document.querySelectorAll(
-    '.project-card, .skill-category, .achievement-card, .about-sidebar, .resume-box, .timeline-content'
-  );
-  if (!panels.length) return;
-
-  // One shared rAF slot: the pointer is only ever over a single panel, so
-  // there's no reason to queue a frame per element.
-  var frame = null, active = null, x = 0, y = 0;
-
-  function paint() {
-    frame = null;
-    if (!active) return;
-    active.style.setProperty('--mx', x + '%');
-    active.style.setProperty('--my', y + '%');
-  }
-
-  Array.prototype.forEach.call(panels, function (panel) {
-    panel.addEventListener('pointermove', function (e) {
-      // Touch and pen never sustain a hover, so tracking them just burns frames.
-      // Checked per-event rather than once at load: a media-query gate evaluated
-      // during startup can latch the wrong answer and disable this for good.
-      if (e.pointerType && e.pointerType !== 'mouse') return;
-      var r = panel.getBoundingClientRect();
-      x = ((e.clientX - r.left) / r.width) * 100;
-      y = ((e.clientY - r.top) / r.height) * 100;
-      active = panel;
-      if (!frame) frame = requestAnimationFrame(paint);
-    }, { passive: true });
-
-    // Hand the spot back to its CSS default so the next hover fades in from
-    // the top edge rather than from wherever the cursor last left.
-    panel.addEventListener('pointerleave', function () {
-      if (active === panel) active = null;
-      panel.style.removeProperty('--mx');
-      panel.style.removeProperty('--my');
-    }, { passive: true });
-  });
-})();
-
-
 // ── GLASS: NAV DENSITY ON SCROLL ──
 // Transparent over the hero, denser once content is passing underneath.
 (function () {

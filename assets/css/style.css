@@ -1524,7 +1524,6 @@
     --glass-chip:   rgba(255,252,245,0.38);
     --glass-border: rgba(255,255,255,0.65);
     --glass-edge:   rgba(255,255,255,0.90);  /* inset top highlight — the lit edge */
-    --glass-sheen:  rgba(255,255,255,0.50);  /* pointer-tracked light spot */
     --glass-ring:   rgba(26,24,20,0.07);
     --glass-shadow: rgba(26,24,20,0.10);
     --glass-nav:    rgba(245,240,232,0.45);
@@ -1545,7 +1544,6 @@
     --glass-chip:   rgba(78,73,60,0.22);
     --glass-border: rgba(245,240,232,0.13);
     --glass-edge:   rgba(245,240,232,0.16);
-    --glass-sheen:  rgba(245,240,232,0.13);
     --glass-ring:   rgba(0,0,0,0.30);
     --glass-shadow: rgba(0,0,0,0.34);
     --glass-nav:    rgba(26,24,20,0.44);
@@ -1596,37 +1594,10 @@
       0 1px 2px var(--glass-ring),
       0 10px 30px -14px var(--glass-shadow),
       inset 0 1px 0 var(--glass-edge);
-    isolation: isolate;  /* keeps the sheen layer above the panel, below the text */
   }
 
   .about-sidebar { padding: 1.75rem; }
   .timeline-content { padding: 1.1rem 1.25rem; margin-top: 0.9rem; }
-
-  /* Light spot. Sits at the top-centre by default and follows the pointer once
-     JS is running — so hover still works with scripting off. */
-  .project-card::after,
-  .skill-category::after,
-  .achievement-card::after,
-  .about-sidebar::after,
-  .resume-box::after,
-  .timeline-content::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    background: radial-gradient(circle 220px at var(--mx, 50%) var(--my, 0%),
-                                var(--glass-sheen), transparent 62%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-  }
-  .project-card:hover::after,
-  .skill-category:hover::after,
-  .achievement-card:hover::after,
-  .about-sidebar:hover::after,
-  .resume-box:hover::after,
-  .timeline-content:hover::after { opacity: 1; }
 
   .project-card:hover,
   .achievement-card:hover {
@@ -1715,13 +1686,4 @@
       --glass-nav: rgba(26,24,20,0.97);
       --glass-nav-on: rgba(26,24,20,0.99);
     }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .project-card::after,
-    .skill-category::after,
-    .achievement-card::after,
-    .about-sidebar::after,
-    .resume-box::after,
-    .timeline-content::after { transition: none; }
   }
