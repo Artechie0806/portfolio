@@ -1498,14 +1498,20 @@
      ─────────────────────────────────────────── */
 
   :root {
-    --glass-blur: 20px;
-    --glass-sat: 170%;
+    --glass-blur: 30px;
+    --glass-sat: 180%;
 
     /* How see-through the bar is. --glass-nav is the resting state over the
        hero; --glass-nav-on is after you scroll. Raise both toward 1 if the
        links start fighting the content sliding under them. */
-    --glass-nav:    rgba(245,240,232,0.45);
-    --glass-nav-on: rgba(245,240,232,0.66);
+    --glass-nav:    rgba(245,240,232,0.36);
+    --glass-nav-on: rgba(245,240,232,0.56);
+
+    /* The mobile dropdown is a tall panel of small type sitting over live
+       content, so it does NOT follow the bar. It stays near-opaque and blurs
+       harder — readability wins over the glass effect here. */
+    --glass-menu:      rgba(245,240,232,0.94);
+    --glass-menu-blur: 40px;
 
     --glass-border: rgba(255,255,255,0.65);
     --glass-ring:   rgba(26,24,20,0.07);
@@ -1513,8 +1519,10 @@
   }
 
   [data-theme="dark"] {
-    --glass-nav:    rgba(26,24,20,0.44);
-    --glass-nav-on: rgba(26,24,20,0.62);
+    --glass-nav:    rgba(26,24,20,0.35);
+    --glass-nav-on: rgba(26,24,20,0.54);
+
+    --glass-menu:   rgba(26,24,20,0.95);
 
     --glass-border: rgba(245,240,232,0.13);
     --glass-ring:   rgba(0,0,0,0.30);
@@ -1536,15 +1544,20 @@
     box-shadow: 0 1px 0 var(--glass-ring), 0 10px 30px -18px var(--glass-shadow);
   }
 
-  /* The mobile menu is the nav — same sheet, dropped down */
+  /* The mobile menu is the nav dropped down — but solid enough to read against
+     whatever is scrolling underneath it. */
   @media (max-width: 900px) {
     .nav-links.open,
     [data-theme="dark"] .nav-links.open {
-      background: var(--glass-nav-on);
-      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-      backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+      background: var(--glass-menu);
+      -webkit-backdrop-filter: blur(var(--glass-menu-blur)) saturate(var(--glass-sat));
+      backdrop-filter: blur(var(--glass-menu-blur)) saturate(var(--glass-sat));
       border-bottom: 1px solid var(--glass-border);
+      box-shadow: 0 18px 40px -22px var(--glass-shadow);
     }
+    /* Full-strength ink for the links themselves — muted grey on a translucent
+       sheet is what made this hard to read. */
+    .nav-links.open a { color: var(--ink); }
   }
 
   /* No backdrop-filter support: no blur to sell the effect, so go near-opaque
@@ -1553,9 +1566,11 @@
     :root {
       --glass-nav: rgba(245,240,232,0.97);
       --glass-nav-on: rgba(245,240,232,0.99);
+      --glass-menu: rgba(245,240,232,1);
     }
     [data-theme="dark"] {
       --glass-nav: rgba(26,24,20,0.97);
       --glass-nav-on: rgba(26,24,20,0.99);
+      --glass-menu: rgba(26,24,20,1);
     }
   }
