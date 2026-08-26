@@ -22,6 +22,16 @@
 <style>
   /* Critical: hold scroll while the loader is up */
   html.loading, html.loading body { overflow: hidden; height: 100%; }
+
+  /* Role progression line inside a single-company timeline entry */
+  .timeline-progression {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin: 0.45rem 0 0.9rem;
+  }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -158,10 +168,13 @@
     <div class="timeline-item reveal">
       <div class="timeline-meta">
         <span class="timeline-period">DEC 2025 – Present</span>
-        <span class="timeline-badge">AI Engineer</span>
+        <span class="timeline-badge">Full-time</span>
       </div>
       <h3 class="timeline-role">AI Engineer</h3>
       <p class="timeline-company">Innoviti Technologies, Navi Mumbai (Onsite)</p>
+      <p class="timeline-progression">
+        AI Intern · Dec 2025 – May 2026 &nbsp;→&nbsp; Converted to full-time · Jun 2026
+      </p>
       <div class="timeline-content">
         <p>Architecting and maintaining high-throughput inference systems for Large Language Models.</p>
         <div class="timeline-achievements">
@@ -422,7 +435,7 @@
     <div class="section-line"></div>
   </div>
   <div class="achievements-grid">
-    
+
     <div class="achievement-card reveal">
       <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="1.8"/><circle cx="4.8" cy="19" r="1.8"/><circle cx="19.2" cy="19" r="1.8"/><circle cx="12" cy="12.4" r="1.8"/><path d="M12 6.3 V10.6"/><path d="M10.5 13.6 6.4 17.6"/><path d="M13.5 13.6 17.6 17.6"/></svg></span>
       <div class="achievement-category">Leadership</div>
@@ -445,11 +458,11 @@
     </div>
 
     <div class="achievement-card reveal">
-        <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4 V20 H20"/><path d="M7 15 11 11 14 13 19 7"/><circle cx="19" cy="7" r="1.1" fill="currentColor" stroke="none"/></svg></span>
-        <div class="achievement-category">Certification</div>
-        <h4 class="achievement-title">Professional Data Science Specialization</h4>
-        <p class="achievement-desc">IBM-certified expertise in data analysis, visualization, and predictive modeling using Python (Jan 2025).</p>
-        </div>
+      <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4 V20 H20"/><path d="M7 15 11 11 14 13 19 7"/><circle cx="19" cy="7" r="1.1" fill="currentColor" stroke="none"/></svg></span>
+      <div class="achievement-category">Certification</div>
+      <h4 class="achievement-title">Professional Data Science Specialization</h4>
+      <p class="achievement-desc">IBM-certified expertise in data analysis, visualization, and predictive modeling using Python (Jan 2025).</p>
+    </div>
 
     <div class="achievement-card reveal">
       <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.2"/><path d="M7 10 10 12.5 7 15"/><path d="M12.5 15 H16.5"/></svg></span>
