@@ -23,10 +23,12 @@
 
   var COUNT_MS = reduce ? 500 : 3600; // count + fill duration (slow, deliberate fill)
   var start = null;
+  var settled = false; // guards against exit()/reveal() running twice
 
   function ease(t) { return 1 - Math.pow(1 - t, 3); } // easeOutCubic
 
   function tick(ts) {
+    if (settled) return;
     if (start === null) start = ts;
     var t = Math.min((ts - start) / COUNT_MS, 1);
     var v = ease(t);
@@ -43,6 +45,8 @@
   }
 
   function exit() {
+    if (settled) return;
+    settled = true;
     if (reduce) { reveal(); return; }
     // bring the live site to life so it's already animating as the loader lifts away
     root.classList.add('site-ready');
@@ -60,6 +64,15 @@
     loader.addEventListener('animationend', finish);
     setTimeout(finish, 1600); // safety fallback (> 1.1s slide)
   }
+
+  // Failsafe: requestAnimationFrame is suspended entirely in a background tab,
+  // so a page opened in one can leave the bar parked at 00 indefinitely.
+  // setTimeout is only throttled, never stopped, so use it as a hard backstop.
+  setTimeout(function () {
+    if (settled) return;
+    settled = true;
+    reveal();
+  }, COUNT_MS + 4000);
 
   requestAnimationFrame(tick);
 })();
