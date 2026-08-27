@@ -15,13 +15,17 @@
     remove(curtain);
   }
 
-  // Show the loader on every page load.
+  // Only run the full loader once per browser session; repeat visits go straight in.
+  var seen = false;
+  try { seen = sessionStorage.getItem('loaderSeen') === '1'; sessionStorage.setItem('loaderSeen', '1'); } catch (e) {}
+  if (seen) { reveal(); return; }
+
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var fill = loader.querySelector('.loader-bar-fill');
   var count = loader.querySelector('.loader-count');
 
-  var COUNT_MS = reduce ? 500 : 3600; // count + fill duration (slow, deliberate fill)
+  var COUNT_MS = reduce ? 400 : 1200; // count + fill duration
   var start = null;
   var settled = false; // guards against exit()/reveal() running twice
 
@@ -40,7 +44,7 @@
     } else {
       if (count) count.textContent = '100';
       // brief beat, then curtain wipe reveal
-      setTimeout(exit, reduce ? 80 : 420);
+      setTimeout(exit, reduce ? 80 : 240);
     }
   }
 
@@ -158,12 +162,18 @@
 const toggle = document.getElementById('themeToggle');
 const html = document.documentElement;
 const saved = localStorage.getItem('theme') || 'light';
-if(saved === 'dark') { html.setAttribute('data-theme','dark'); toggle.textContent = '☀'; }
+function syncToggle(dark) {
+  toggle.textContent = dark ? '☀' : '☽';
+  toggle.setAttribute('aria-pressed', dark ? 'true' : 'false');
+  toggle.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+}
+if(saved === 'dark') { html.setAttribute('data-theme','dark'); }
+syncToggle(saved === 'dark');
 
 toggle.addEventListener('click', () => {
   const isDark = html.getAttribute('data-theme') === 'dark';
   html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  toggle.textContent = isDark ? '☽' : '☀';
+  syncToggle(!isDark);
   localStorage.setItem('theme', isDark ? 'light' : 'dark');
 });
 
@@ -196,22 +206,6 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1 });
 reveals.forEach(r => observer.observe(r));
-
-// ── FORM SUBMIT ──
-function handleFormSubmit(e) {
-  e.preventDefault();
-  const btn = document.getElementById('submitBtn');
-  const msg = document.getElementById('formMsg');
-  btn.textContent = 'Sending...';
-  btn.disabled = true;
-  setTimeout(() => {
-    btn.textContent = 'Sent ✓';
-    msg.style.display = 'block';
-    msg.textContent = '→ Message received. I\'ll get back to you soon!';
-    e.target.reset();
-    setTimeout(() => { btn.textContent = 'Send Message →'; btn.disabled = false; msg.style.display = 'none'; }, 4000);
-  }, 1200);
-}
 
 // ── SMOOTH ACTIVE NAV ──
 document.querySelectorAll('a[href^="#"]').forEach(a => {

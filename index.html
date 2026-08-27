@@ -4,9 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Aryan Rane - Software Developer & AI/ML Engineer. Portfolio showcasing projects in AI, Machine Learning, Full Stack Development.">
-<meta name="keywords" content="Aryan Rane, Software Developer, AI ML Engineer, Machine Learning, Full Stack Developer, Portfolio">
 <meta name="author" content="Aryan Rane">
 <title>Aryan Rane | Software Developer & AI/ML Engineer</title>
+<link rel="canonical" href="https://artechie0806.github.io/portfolio/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://artechie0806.github.io/portfolio/">
+<meta property="og:title" content="Aryan Rane | Software Developer & AI/ML Engineer">
+<meta property="og:description" content="AI Engineer at Innoviti. Self-hosted LLM inference, computer vision, and full-stack projects — with honest write-ups of what worked and what didn't.">
+<meta property="og:image" content="https://artechie0806.github.io/portfolio/assets/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Aryan Rane | Software Developer & AI/ML Engineer">
+<meta name="twitter:description" content="AI Engineer at Innoviti. Self-hosted LLM inference, computer vision, and full-stack projects.">
+<meta name="twitter:image" content="https://artechie0806.github.io/portfolio/assets/img/og-image.png">
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 <link rel="apple-touch-icon" href="assets/img/favicon.svg">
 <link rel="stylesheet" href="assets/css/style.css">
@@ -36,6 +45,7 @@
   }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -66,7 +76,7 @@
     <li><a href="#contact">Contact</a></li>
   </ul>
   <div style="display:flex;align-items:center;gap:0.75rem;">
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">☽</button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode" aria-pressed="false">☽</button>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -88,7 +98,7 @@
     <div class="hero-cta">
       <a href="#projects" class="btn-primary">View Projects ↓</a>
       <a href="#contact" class="btn-outline">Get in Touch ↓</a>
-      <a href="https://drive.google.com/file/d/1-WEqHa_uEZNNibIU1Ulyc6HRxD-GHo0z/view?usp=drive_link" target="_blank" class="btn-outline">Resume ↓</a>
+      <a href="https://drive.google.com/file/d/1-WEqHa_uEZNNibIU1Ulyc6HRxD-GHo0z/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="btn-outline">Resume ↓</a>
     </div>
   </div>
   <div class="hero-right">
@@ -191,7 +201,7 @@
     <div class="timeline-item reveal">
       <div class="timeline-meta">
         <span class="timeline-period">JUN 2025 – AUG 2025</span>
-        <span class="timeline-badge">AI Intern</span>
+        <span class="timeline-badge">Internship</span>
       </div>
       <h3 class="timeline-role">AI Intern</h3>
       <p class="timeline-company">CN Techies, Onsite</p>
@@ -320,7 +330,7 @@
             Built a seven-agent pipeline (Router → SQL author → critic → chart agent → narrator) over a two-pass profiler that derives every table's grain, column roles, joins, and quality flags at upload — no data dictionary. Model-authored SQL runs read-only behind a statement guard with row caps and timeouts, and every chart is deterministically reconciled against the actual result before rendering.
         </div>
         <div class="project-links">
-            <a href="https://github.com/Artechie0806/Datascripe" target="_blank" class="project-link">⌥ GitHub</a>
+            <a href="https://github.com/Artechie0806/Datascripe" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
         </div>
     </div>
 
@@ -337,7 +347,7 @@
             Built a Researcher → Verifier → Orchestrator pipeline that isolates the fact-checker — it sees only a claim and its cited text, and must extract a supporting quote that is then located in the original by string search, with the verdict downgraded automatically when it isn't found. Every call runs inside a 16k-token budget; reports ship with grounding rate, verdict breakdown, and real token counts.
         </div>
         <div class="project-links">
-            <a href="https://github.com/Artechie0806/Research-Agent" target="_blank" class="project-link">⌥ GitHub</a>
+            <a href="https://github.com/Artechie0806/Research-Agent" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
         </div>
     </div>
 
@@ -354,7 +364,7 @@
             Every chunk is a complete class, function, or method carrying its file path, line range, parent class, and imports. The embedded text pairs an LLM-written summary with the source, closing the vocabulary gap between a plain-English question and a code corpus. Docstring injection runs bottom-to-top so line numbers stay valid as text is inserted, and skips symbols that already have a docstring — so re-running is idempotent.
         </div>
         <div class="project-links">
-            <a href="https://github.com/Artechie0806/AI-code-Documentation-and-QA" target="_blank" class="project-link">⌥ GitHub</a>
+            <a href="https://github.com/Artechie0806/AI-code-Documentation-and-QA" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
         </div>
     </div>
 
@@ -371,7 +381,7 @@
             ~90% classification accuracy on the held-out set. Read that number with a caveat I'd rather state than hide: the split wasn't grouped by patient, and a CT study contributes many near-identical slices, so the figure is likely optimistic until it's re-run with patient-level grouping and reported as sensitivity/specificity — the right framing for a screening task where a false negative costs far more than a false positive.
         </div>
         <div class="project-links">
-            <a href="https://github.com/Artechie0806/Brain-Stroke-Classification.git" target="_blank" class="project-link">⌥ GitHub</a>
+            <a href="https://github.com/Artechie0806/Brain-Stroke-Classification.git" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
         </div>
     </div>
 
@@ -388,7 +398,7 @@
             Documented the leakage rather than the headline number, along with two related findings: dropping rows with missing diameter took 958k raw records down to ~132k and biased the sample toward well-observed objects, and with 60 positives in a 39,614-row test set, accuracy sits 0.14 points above a model that predicts "not hazardous" for everything. The honest version predicts from orbital elements alone and scores far lower.
         </div>
         <div class="project-links">
-            <a href="https://github.com/Artechie0806/Asteroid-prediction.git" target="_blank" class="project-link">⌥ GitHub</a>
+            <a href="https://github.com/Artechie0806/Asteroid-prediction.git" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
         </div>
     </div>
 
@@ -405,7 +415,7 @@
             ~64% accuracy on MURA's official, patient-disjoint validation set with the base frozen. Full fine-tuning scored 85%, but on a StratifiedKFold split of the <em>training</em> set taken at image level — MURA has roughly three images per study, so the same study lands on both sides. Recorded as a split-integrity failure rather than reported as the headline; the fix is GroupKFold on patient id. Class weighting, focal loss, threshold sweeping, and PR curves throughout.
         </div>
         <div class="project-links">
-            <a href="https://github.com/Artechie0806/MURA-X-Ray-Classification-Efficientnet-.git" target="_blank" class="project-link">⌥ GitHub</a>
+            <a href="https://github.com/Artechie0806/MURA-X-Ray-Classification-Efficientnet-.git" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
         </div>
     </div>
 
@@ -422,7 +432,7 @@
             Maps 21 MediaPipe hand landmarks to real-time control: the middle-finger knuckle drives ship position because it stays steadier than the wrist under rotation, and a fingertip dropping below that knuckle fires. The capture is mirrored so movement reads intuitively. Six-enemy wave with random respawn and dynamic scoring.
         </div>
         <div class="project-links">
-            <a href="https://github.com/Artechie0806/space-invader-using-hand-detection.git" target="_blank" class="project-link">⌥ GitHub</a>
+            <a href="https://github.com/Artechie0806/space-invader-using-hand-detection.git" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
         </div>
     </div>
 
@@ -495,7 +505,7 @@
       <h3>Download My CV</h3>
       <p>Get a comprehensive view of my education, experience, skills, and projects. Available as a PDF — always up to date.</p>
     </div>
-    <a href="https://drive.google.com/file/d/1-WEqHa_uEZNNibIU1Ulyc6HRxD-GHo0z/view?usp=drive_link" target="_blank" class="btn-primary" style="white-space:nowrap;">
+    <a href="https://drive.google.com/file/d/1-WEqHa_uEZNNibIU1Ulyc6HRxD-GHo0z/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="btn-primary" style="white-space:nowrap;">
       ↓ &nbsp; Download Resume
     </a>
   </div>
@@ -520,14 +530,14 @@
           <span class="contact-link-value">aryanrane.dev@gmail.com</span>
         </div>
       </a>
-      <a href="https://www.linkedin.com/in/aryanrane0/" target="_blank" class="contact-link">
+      <a href="https://www.linkedin.com/in/aryanrane0/" target="_blank" rel="noopener noreferrer" class="contact-link">
         <div class="contact-link-icon">in</div>
         <div>
           <span class="contact-link-label">LinkedIn</span>
           <span class="contact-link-value">linkedin.com/in/aryanrane0</span>
         </div>
       </a>
-      <a href="https://github.com/Artechie0806" target="_blank" class="contact-link">
+      <a href="https://github.com/Artechie0806" target="_blank" rel="noopener noreferrer" class="contact-link">
         <div class="contact-link-icon">⌥</div>
         <div>
           <span class="contact-link-label">GitHub</span>
@@ -542,8 +552,8 @@
 <footer>
   <p>© Aryan Rane. Crafted with care.</p>
   <div style="display:flex;gap:2rem;">
-    <a href="https://github.com/Artechie0806" target="_blank">GitHub</a>
-    <a href="https://www.linkedin.com/in/aryanrane0/" target="_blank">LinkedIn</a>
+    <a href="https://github.com/Artechie0806" target="_blank" rel="noopener noreferrer">GitHub</a>
+    <a href="https://www.linkedin.com/in/aryanrane0/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
     <a href="mailto:aryanrane.dev@gmail.com">Email</a>
   </div>
 </footer>

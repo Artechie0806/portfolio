@@ -1574,3 +1574,11 @@
       --glass-menu: rgba(26,24,20,1);
     }
   }
+
+/* ── KEYBOARD FOCUS ── */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--accent-warm);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
