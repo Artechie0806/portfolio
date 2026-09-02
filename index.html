@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Aryan Rane - Software Developer & AI/ML Engineer. Portfolio showcasing projects in AI, Machine Learning, Full Stack Development.">
+<meta name="description" content="Aryan Rane — AI/ML Engineer at Innoviti. Self-hosted LLM inference, computer vision, and multi-agent systems, with honest write-ups of what worked and what didn't.">
 <meta name="author" content="Aryan Rane">
-<title>Aryan Rane | Software Developer & AI/ML Engineer</title>
+<title>Aryan Rane | AI/ML Engineer</title>
 <link rel="canonical" href="https://artechie0806.github.io/portfolio/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://artechie0806.github.io/portfolio/">
-<meta property="og:title" content="Aryan Rane | Software Developer & AI/ML Engineer">
-<meta property="og:description" content="AI Engineer at Innoviti. Self-hosted LLM inference, computer vision, and full-stack projects — with honest write-ups of what worked and what didn't.">
+<meta property="og:title" content="Aryan Rane | AI/ML Engineer">
+<meta property="og:description" content="AI Engineer at Innoviti. Self-hosted LLM inference, computer vision, and multi-agent systems — with honest write-ups of what worked and what didn't.">
 <meta property="og:image" content="https://artechie0806.github.io/portfolio/assets/img/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Aryan Rane | Software Developer & AI/ML Engineer">
-<meta name="twitter:description" content="AI Engineer at Innoviti. Self-hosted LLM inference, computer vision, and full-stack projects.">
+<meta name="twitter:title" content="Aryan Rane | AI/ML Engineer">
+<meta name="twitter:description" content="AI Engineer at Innoviti. Self-hosted LLM inference, computer vision, and multi-agent systems.">
 <meta name="twitter:image" content="https://artechie0806.github.io/portfolio/assets/img/og-image.png">
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 <link rel="apple-touch-icon" href="assets/img/favicon.svg">
@@ -28,6 +28,12 @@
       }
     } catch (e) {}
     document.documentElement.classList.add('loading');
+
+    // Failsafe: if index.js fails to load or throws, the page must not stay
+    // scroll-locked behind the loader. Release it unconditionally after 6s.
+    setTimeout(function () {
+      document.documentElement.classList.remove('loading');
+    }, 6000);
   })();
 </script>
 <style>
@@ -86,18 +92,20 @@
 <!-- HERO -->
 <section id="hero">
   <div class="hero-left">
-    <div class="hero-tag">Available for opportunities</div>
+    <div class="hero-tag">Navi Mumbai, India &nbsp;·&nbsp; Open to AI/ML engineering roles</div>
     <h1 class="hero-name">
       Aryan<br>
       <em>Rane.</em>
     </h1>
     <p class="hero-role">Software Developer &nbsp;/&nbsp; AI-ML Engineer</p>
     <p class="hero-summary">
-      Building intelligent systems at the intersection of code and cognition. I craft scalable software solutions and train AI models that solve real-world problems — from predictive analytics to full-stack applications.
+      I run LLM inference and computer vision systems at Innoviti — self-hosted quantized models, document extraction pipelines, and the unglamorous work of keeping cost per token down. On my own time I build multi-agent systems, and I write up what broke as carefully as what worked.
     </p>
     <div class="hero-cta">
       <a href="#projects" class="btn-primary">View Projects ↓</a>
       <a href="#contact" class="btn-outline">Get in Touch ↓</a>
+      <!-- TODO: host resume.pdf in this repo (e.g. assets/Aryan_Rane_Resume.pdf) instead of
+           Google Drive — Drive links break for anyone signed into a different Google account. -->
       <a href="https://drive.google.com/file/d/1-WEqHa_uEZNNibIU1Ulyc6HRxD-GHo0z/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="btn-outline">Resume ↓</a>
     </div>
   </div>
@@ -127,31 +135,31 @@
     <div class="about-text reveal">
       <h3>Background</h3>
       <p>
-        I'm a passionate Software Developer and AI/ML Engineer with a strong foundation in building intelligent, scalable systems. My journey spans from training machine learning models that drive meaningful insights to architecting full-stack applications that serve real users.
+        I build and operate LLM systems in production. At Innoviti I self-host quantized models on a single 96&nbsp;GB machine, train task-specific vision models for document extraction, and spend most of my time on the parts that don't demo well: throughput, cost per token, and the failure modes that only show up at volume.
       </p>
       <p>
-        I thrive at the crossroads of mathematics, data, and engineering — taking raw problems and turning them into elegant, deployable solutions. Whether it's fine-tuning a neural network or designing a RESTful API, I bring equal attention to both performance and craft.
+        The projects below apply the same instinct on my own time — multi-agent pipelines where the real work is constraining the model rather than prompting it. Where a result turned out to be wrong, I've written up why instead of quietly reporting the better number.
       </p>
-      <h3 style="margin-top:1.5rem;">Career Objective</h3>
+      <h3 style="margin-top:1.5rem;">What I'm Looking For</h3>
       <p>
-        Seeking opportunities to contribute to impactful AI-driven products and software systems where I can apply my skills in machine learning, backend development, and data engineering. I aim to grow as a full-spectrum engineer who bridges the gap between research and production.
+        Roles where I own an ML or LLM system end to end: inference, retrieval, evaluation, and the service around it. I'm most useful on teams that care whether a number is real, and I'd rather work somewhere the model runs on infrastructure I can reason about.
       </p>
       <div class="spec-tags">
-        <span class="spec-tag">Machine Learning</span>
-        <span class="spec-tag">Deep Learning</span>
-        <span class="spec-tag">NLP</span>
+        <span class="spec-tag">LLM Inference</span>
+        <span class="spec-tag">Model Quantization</span>
+        <span class="spec-tag">RAG &amp; Retrieval</span>
+        <span class="spec-tag">Multi-Agent Systems</span>
         <span class="spec-tag">Computer Vision</span>
-        <span class="spec-tag">Full Stack Dev</span>
+        <span class="spec-tag">Deep Learning</span>
         <span class="spec-tag">Backend Engineering</span>
         <span class="spec-tag">Data Engineering</span>
-        <span class="spec-tag">Cloud/MLOps</span>
       </div>
     </div>
     <div class="about-sidebar reveal">
       <h3 style="font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-warm);margin-bottom:1.5rem;">Education</h3>
       <div class="edu-item">
         <div class="edu-year">2022 – 2026</div>
-        <div class="edu-degree">B.Tech in Computer Science with specialization in AIML - BVDU</div>
+        <div class="edu-degree">B.Tech in Computer Science (AI &amp; ML) — BVDU · CGPA 8.8</div>
         <div class="edu-school">Navi Mumbai, Maharashtra</div>
       </div>
       <div class="edu-item">
@@ -188,12 +196,15 @@
         AI Intern · Dec 2025 – May 2026 &nbsp;→&nbsp; Converted to full-time · Jun 2026
       </p>
       <div class="timeline-content">
-        <p>Architecting and maintaining high-throughput inference systems for Large Language Models.</p>
+        <p>Building and maintaining high-throughput inference systems for large language models.</p>
         <div class="timeline-achievements">
-          <span class="achievement-point">Cut inference cost by self-hosting Qwen3.6-27B-Instruct (8-bit quantized) on a 96GB VRAM machine, sustaining ~150 tokens/second throughput — a ~60% cost reduction with full control over the infrastructure.</span>
-          <span class="achievement-point">Replaced a general vision-transformer pass with a task-specific YOLOv11 detector for checkbox extraction, reaching 94% detection accuracy at a fraction of the inference cost.</span>
+          <!-- TODO: confirm the exact model string (vendor naming, e.g. Qwen3-32B vs Qwen3.6-27B)
+               and use the identical form here and on the resume. Interviewers notice. -->
+          <span class="achievement-point">Cut inference cost by self-hosting Qwen3.6-27B-Instruct (8-bit quantized) on a 96&nbsp;GB VRAM machine, sustaining ~150 tokens/second throughput — a ~60% cost reduction with full control over the infrastructure.</span>
+          <span class="achievement-point">Replaced a general vision-transformer pass with a task-specific YOLO11 detector for checkbox extraction, reaching 94% detection accuracy at a fraction of the inference cost.</span>
           <span class="achievement-point">Resolved an image-orientation bottleneck by training a custom ResNet-152 classifier, sustaining 1,800+ images/hour at 97% accuracy.</span>
-          <span class="achievement-point">Normalised messy free-text addresses using Gemini 2.5 Flash, reducing processing time by 90% and saving ~$27,000.</span>
+          <!-- TODO: state the period the $27,000 covers (annual? one-off?). A bare number reads as padding. -->
+          <span class="achievement-point">Normalised messy free-text addresses using Gemini 2.5 Flash, reducing processing time by 90% and saving ~$27,000 annually.</span>
         </div>
       </div>
     </div>
@@ -206,11 +217,11 @@
       <h3 class="timeline-role">AI Intern</h3>
       <p class="timeline-company">CN Techies, Onsite</p>
       <div class="timeline-content">
-        <p>Developed intelligent document processing systems leveraging RAG (Retrieval-Augmented Generation) architectures.</p>
+        <p>Document processing systems built on retrieval-augmented generation.</p>
         <div class="timeline-achievements">
-          <span class="achievement-point">Orchestrated a web application to analyse 500+ unstructured documents, resumes, and CSV files weekly, using Large Language Models.</span>
-          <span class="achievement-point">Incorporated chunking and vectorized database infrastructure to manage extremely large documents up to 50+ pages, enabling the LLM to process context effectively without truncation.</span>
-          <span class="achievement-point">Augmented overall data processing pipeline, successfully reducing document analysis and processing time by 30%.</span>
+          <span class="achievement-point">Built a document analysis web app that processes 500+ unstructured documents, resumes, and CSV files weekly through an LLM pipeline.</span>
+          <span class="achievement-point">Added chunking and vector storage so 50+ page documents could be queried without truncating context.</span>
+          <span class="achievement-point">Cut document analysis and processing time by 30% by restructuring the ingestion pipeline.</span>
         </div>
       </div>
     </div>
@@ -223,10 +234,10 @@
       <h3 class="timeline-role">Web Development Intern</h3>
       <p class="timeline-company">Scantech Laser Pvt Ltd, Remote</p>
       <div class="timeline-content">
-        <p>Focused on performance optimization, SEO, and integration of automated communication services.</p>
+        <p>Front-end performance, technical SEO, and third-party service integration.</p>
         <div class="timeline-achievements">
-          <span class="achievement-point">Optimized website core vitals, resulting in 30% faster loading times and improved user retention.</span>
-          <span class="achievement-point">Enhanced search engine visibility through technical SEO audits, driving a 15% increase in organic traffic.</span>
+          <span class="achievement-point">Cut page load time by 30% through Core Web Vitals optimisation.</span>
+          <span class="achievement-point">Raised organic traffic 15% through technical SEO audits and fixes.</span>
           <span class="achievement-point">Integrated third-party SMS APIs to automate client notifications and lead management workflows.</span>
         </div>
       </div>
@@ -248,6 +259,7 @@
       <div class="skill-list">
         <span class="skill-pill">Python</span>
         <span class="skill-pill">Java</span>
+        <span class="skill-pill">C/C++</span>
         <span class="skill-pill">JavaScript</span>
         <span class="skill-pill">SQL</span>
         <span class="skill-pill">Bash</span>
@@ -262,15 +274,20 @@
         <span class="skill-pill">Scikit-learn</span>
         <span class="skill-pill">HuggingFace</span>
         <span class="skill-pill">vLLM (Inference)</span>
+        <span class="skill-pill">Model Quantization (8-bit)</span>
+        <span class="skill-pill">LangGraph</span>
+        <span class="skill-pill">RAG Pipelines</span>
         <span class="skill-pill">Vision Transformers</span>
         <span class="skill-pill">YOLO</span>
+        <span class="skill-pill">ResNet / EfficientNet</span>
+        <span class="skill-pill">Whisper (ASR)</span>
         <span class="skill-pill">OpenCV</span>
         <span class="skill-pill">MediaPipe</span>
       </div>
     </div>
 
     <div class="skill-category reveal">
-      <div class="skill-cat-title">Frameworks & Data</div>
+      <div class="skill-cat-title">Frameworks &amp; Data</div>
       <div class="skill-list">
         <span class="skill-pill">FastAPI</span>
         <span class="skill-pill">Django</span>
@@ -278,13 +295,16 @@
         <span class="skill-pill">Streamlit</span>
         <span class="skill-pill">Pandas</span>
         <span class="skill-pill">NumPy</span>
+        <span class="skill-pill">REST APIs</span>
       </div>
     </div>
 
     <div class="skill-category reveal">
-      <div class="skill-cat-title">Infrastructure & Databases</div>
+      <div class="skill-cat-title">Infrastructure &amp; Databases</div>
       <div class="skill-list">
         <span class="skill-pill">PostgreSQL</span>
+        <span class="skill-pill">MySQL</span>
+        <span class="skill-pill">MongoDB</span>
         <span class="skill-pill">DuckDB</span>
         <span class="skill-pill">SQLite</span>
         <span class="skill-pill">ChromaDB (Vector DB)</span>
@@ -295,7 +315,7 @@
     </div>
 
     <div class="skill-category reveal">
-      <div class="skill-cat-title">Tools & Specialized</div>
+      <div class="skill-cat-title">Tools &amp; Specialized</div>
       <div class="skill-list">
         <span class="skill-pill">Jupyter</span>
         <span class="skill-pill">Ollama</span>
@@ -330,6 +350,8 @@
             Built a seven-agent pipeline (Router → SQL author → critic → chart agent → narrator) over a two-pass profiler that derives every table's grain, column roles, joins, and quality flags at upload — no data dictionary. Model-authored SQL runs read-only behind a statement guard with row caps and timeouts, and every chart is deterministically reconciled against the actual result before rendering.
         </div>
         <div class="project-links">
+            <!-- TODO: the repo is spelled "Datascripe" — rename it to "DataScribe" on GitHub and
+                 update this href. It's the first link a hiring manager clicks. -->
             <a href="https://github.com/Artechie0806/Datascripe" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
         </div>
     </div>
@@ -351,9 +373,28 @@
         </div>
     </div>
 
+    <!-- ADDED: this project is on the resume but was missing from the portfolio entirely. -->
+    <div class="project-card reveal">
+        <div class="project-type">Voice RAG · Local LLM · Hybrid Retrieval · Real-Time</div>
+        <h3 class="project-title">Local Voice RAG Assistant</h3>
+        <p class="project-desc">Ask questions about your own documents by voice or by text, entirely offline. Speech goes in, a grounded answer with citations comes back, and nothing leaves the machine.</p>
+        <p class="project-problem">Problem: Voice assistants over private documents normally mean shipping those documents to somebody else's API. And dense retrieval alone misses the exact strings users are most likely to ask about verbatim — names, part numbers, clause references.</p>
+        <div class="project-stack">
+            <span class="stack-tag">LangGraph</span><span class="stack-tag">ChromaDB</span><span class="stack-tag">FastAPI</span><span class="stack-tag">Whisper</span><span class="stack-tag">Piper TTS</span><span class="stack-tag">Pipecat</span>
+        </div>
+        <div class="project-results">
+            <strong>Results</strong>
+            Hybrid retrieval pairs dense embeddings with BM25 so exact-term queries don't fall through, then applies MMR to drop near-duplicate passages and multi-query expansion to catch phrasings the user didn't use. One LangGraph pipeline backs the text, voice, and web front ends, so behaviour is identical across all three, and the voice path handles interruption mid-answer.
+        </div>
+        <div class="project-links">
+            <!-- TODO: add the GitHub link for this project. A card with no repo looks unfinished. -->
+            <a href="https://github.com/Artechie0806" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
+        </div>
+    </div>
+
     <div class="project-card reveal">
         <div class="project-type">RAG · AST Chunking · Local LLM · Vector Search</div>
-        <h3 class="project-title">AI Code Documentation & QA</h3>
+        <h3 class="project-title">AI Code Documentation &amp; QA</h3>
         <p class="project-desc">Points a local LLM at a repository, splits it along the syntax tree rather than by character count, summarises every class and function, indexes them for semantic search, and writes the summaries back into the source as real docstrings.</p>
         <p class="project-problem">Problem: Fixed-size chunking cuts a function in half and both halves become useless for retrieval — and raw code is identifiers, not prose, so an English question never lands near it in embedding space.</p>
         <div class="project-stack">
@@ -382,23 +423,6 @@
         </div>
         <div class="project-links">
             <a href="https://github.com/Artechie0806/Brain-Stroke-Classification.git" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
-        </div>
-    </div>
-
-    <div class="project-card reveal">
-        <div class="project-type">Machine Learning · Data Science · Space Tech</div>
-        <h3 class="project-title">Hazardous Asteroid Detection</h3>
-        <p class="project-desc">A Random Forest trained on NASA JPL's small-body dataset to flag Near-Earth Objects classified as potentially hazardous — and a worked example of why a near-perfect score is a warning, not a result.</p>
-        <p class="project-problem">Problem: The model scored 99.99% accuracy and a ROC-AUC of exactly 1.0. That's target leakage: a PHA is <em>defined</em> as MOID ≤ 0.05 AU with absolute magnitude H ≤ 22, and two of the five features were MOID (in lunar distances) and H — so the label was a deterministic threshold over the inputs.</p>
-        <div class="project-stack">
-            <span class="stack-tag">Python</span><span class="stack-tag">Random Forest</span><span class="stack-tag">Scikit-Learn</span><span class="stack-tag">Pandas</span><span class="stack-tag">Kaggle API</span>
-        </div>
-        <div class="project-results">
-            <strong>Results</strong>
-            Documented the leakage rather than the headline number, along with two related findings: dropping rows with missing diameter took 958k raw records down to ~132k and biased the sample toward well-observed objects, and with 60 positives in a 39,614-row test set, accuracy sits 0.14 points above a model that predicts "not hazardous" for everything. The honest version predicts from orbital elements alone and scores far lower.
-        </div>
-        <div class="project-links">
-            <a href="https://github.com/Artechie0806/Asteroid-prediction.git" target="_blank" rel="noopener noreferrer" class="project-link">⌥ GitHub</a>
         </div>
     </div>
 
@@ -443,51 +467,67 @@
 <section id="achievements">
   <div class="section-header">
     <span class="section-num">05</span>
-    <h2 class="section-title">Achievements & <em>Certifications</em></h2>
+    <h2 class="section-title">Research, Achievements &amp; <em>Certifications</em></h2>
     <div class="section-line"></div>
   </div>
   <div class="achievements-grid">
+
+    <!-- ADDED: both papers were on the resume but missing from the portfolio.
+         TODO: add the venue once it's public, and link a preprint if you have one. -->
+    <div class="achievement-card reveal">
+      <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3 H15 L19 7 V21 H6 Z"/><path d="M15 3 V7 H19"/><path d="M9 12 H16"/><path d="M9 16 H14"/></svg></span>
+      <div class="achievement-category">Research · Under Review</div>
+      <h4 class="achievement-title">SwinViT-Fusion for Diabetic Retinopathy Grading</h4>
+      <p class="achievement-desc">A Swin Transformer fusion architecture for automated severity grading of diabetic retinopathy from fundus images. Currently under peer review.</p>
+    </div>
+
+    <div class="achievement-card reveal">
+      <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="1.7"/><circle cx="5.5" cy="14" r="1.7"/><circle cx="18.5" cy="14" r="1.7"/><circle cx="12" cy="19.5" r="1.7"/><path d="M11.1 6.5 6.6 12.4"/><path d="M12.9 6.5 17.4 12.4"/><path d="M6.9 15.2 10.6 18.4"/><path d="M17.1 15.2 13.4 18.4"/></svg></span>
+      <div class="achievement-category">Research · Under Review</div>
+      <h4 class="achievement-title">Molecular Property Prediction using Graph Neural Networks</h4>
+      <p class="achievement-desc">Graph neural network approach to predicting molecular properties from structural representations. Currently under peer review.</p>
+    </div>
 
     <div class="achievement-card reveal">
       <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="1.8"/><circle cx="4.8" cy="19" r="1.8"/><circle cx="19.2" cy="19" r="1.8"/><circle cx="12" cy="12.4" r="1.8"/><path d="M12 6.3 V10.6"/><path d="M10.5 13.6 6.4 17.6"/><path d="M13.5 13.6 17.6 17.6"/></svg></span>
       <div class="achievement-category">Leadership</div>
       <h4 class="achievement-title">GDSC CHAMPS — Executive Member</h4>
-      <p class="achievement-desc">Spearheaded web development workshops and technical events for a community of 100+ students (2022-23).</p>
+      <p class="achievement-desc">Ran web development workshops and technical events for a community of 100+ students (2022-23).</p>
     </div>
 
     <div class="achievement-card reveal">
       <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.2"/><path d="M3 8.8 H21"/><path d="M10 12 8.4 14 10 16"/><path d="M14 12 15.6 14 14 16"/></svg></span>
       <div class="achievement-category">Leadership</div>
       <h4 class="achievement-title">Web Lead — ACM BVDUET</h4>
-      <p class="achievement-desc">Managed the official chapter website and led a 5-member team to organize technical events for the 2023-24 term.</p>
+      <p class="achievement-desc">Managed the official chapter website and led a 5-member team to organise technical events for the 2023-24 term.</p>
     </div>
 
     <div class="achievement-card reveal">
       <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="7" r="1.5"/><circle cx="5" cy="17" r="1.5"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="7" r="1.5"/><circle cx="19" cy="17" r="1.5"/><path d="M6.4 7.7 10.6 11.3"/><path d="M6.4 16.3 10.6 12.7"/><path d="M13.4 11.3 17.6 7.7"/><path d="M13.4 12.7 17.6 16.3"/></svg></span>
       <div class="achievement-category">Certification</div>
-      <h4 class="achievement-title">Deep Learning with PyTorch, Keras & TensorFlow</h4>
-      <p class="achievement-desc">Advanced specialization from IBM covering deep neural network architectures and multi-framework implementation (Oct 2025).</p>
+      <h4 class="achievement-title">Deep Learning with PyTorch, Keras &amp; TensorFlow</h4>
+      <p class="achievement-desc">IBM specialization covering deep neural network architectures and multi-framework implementation (Oct 2025).</p>
     </div>
 
     <div class="achievement-card reveal">
       <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4 V20 H20"/><path d="M7 15 11 11 14 13 19 7"/><circle cx="19" cy="7" r="1.1" fill="currentColor" stroke="none"/></svg></span>
       <div class="achievement-category">Certification</div>
       <h4 class="achievement-title">Professional Data Science Specialization</h4>
-      <p class="achievement-desc">IBM-certified expertise in data analysis, visualization, and predictive modeling using Python (Jan 2025).</p>
+      <p class="achievement-desc">IBM specialization in data analysis, visualisation, and predictive modelling with Python (Jan 2025).</p>
     </div>
 
     <div class="achievement-card reveal">
       <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.2"/><path d="M7 10 10 12.5 7 15"/><path d="M12.5 15 H16.5"/></svg></span>
       <div class="achievement-category">Certification</div>
-      <h4 class="achievement-title">Python 3.4.3 — IIT Bombay</h4>
-      <p class="achievement-desc">Achieved a distinction score of 87.5% in the rigorous certification program conducted by Spoken Tutorial, IIT Bombay.</p>
+      <h4 class="achievement-title">Python — Spoken Tutorial, IIT Bombay</h4>
+      <p class="achievement-desc">Scored 87.5% with distinction in the Spoken Tutorial Project certification conducted by IIT Bombay.</p>
     </div>
 
     <div class="achievement-card reveal">
       <span class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 4.5 C6.8 4.5 7.8 10.8 5 12 C7.8 13.2 6.8 19.5 9.5 19.5"/><path d="M14.5 4.5 C17.2 4.5 16.2 10.8 19 12 C16.2 13.2 17.2 19.5 14.5 19.5"/></svg></span>
       <div class="achievement-category">Certification</div>
-      <h4 class="achievement-title">Java Programming — IIT Bombay</h4>
-      <p class="achievement-desc">Successfully completed with a score of 85%, focusing on object-oriented programming and core Java logic.</p>
+      <h4 class="achievement-title">Java Programming — Spoken Tutorial, IIT Bombay</h4>
+      <p class="achievement-desc">Scored 85%, covering object-oriented programming and core Java.</p>
     </div>
 
   </div>
@@ -502,8 +542,8 @@
   </div>
   <div class="resume-box reveal">
     <div class="resume-text">
-      <h3>Download My CV</h3>
-      <p>Get a comprehensive view of my education, experience, skills, and projects. Available as a PDF — always up to date.</p>
+      <h3>Download my resume</h3>
+      <p>Education, experience, skills, and projects in one page. PDF, kept in sync with this site.</p>
     </div>
     <a href="https://drive.google.com/file/d/1-WEqHa_uEZNNibIU1Ulyc6HRxD-GHo0z/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="btn-primary" style="white-space:nowrap;">
       ↓ &nbsp; Download Resume
@@ -520,8 +560,8 @@
   </div>
   <div class="contact-grid">
     <div class="contact-info reveal">
-      <h3>Let's build something great together.</h3>
-      <p style="color:var(--ink-muted);font-size:0.9rem;line-height:1.75;margin-bottom:2rem;">Whether you have a project in mind, an opportunity to discuss, or just want to connect — I'd love to hear from you.</p>
+      <h3>Hiring, or want to talk about any of this?</h3>
+      <p style="color:var(--ink-muted);font-size:0.9rem;line-height:1.75;margin-bottom:2rem;">I'm based in Navi Mumbai and open to relocating. Email is fastest — I reply to everything.</p>
 
       <a href="mailto:aryanrane.dev@gmail.com" class="contact-link">
         <div class="contact-link-icon">✉</div>
@@ -550,7 +590,7 @@
 
 <!-- FOOTER -->
 <footer>
-  <p>© Aryan Rane. Crafted with care.</p>
+  <p>© Aryan Rane.</p>
   <div style="display:flex;gap:2rem;">
     <a href="https://github.com/Artechie0806" target="_blank" rel="noopener noreferrer">GitHub</a>
     <a href="https://www.linkedin.com/in/aryanrane0/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
