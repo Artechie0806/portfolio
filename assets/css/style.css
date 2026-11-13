@@ -1515,7 +1515,10 @@
     --glass-sat: 180%;
     --glass-radius: 22px;
 
-    --glass-fill: linear-gradient(135deg, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0.26) 55%, rgba(255,255,255,0.38) 100%);
+    --gf-1: rgba(255,255,255,0.60);
+    --gf-2: rgba(255,255,255,0.26);
+    --gf-3: rgba(255,255,255,0.38);
+    --glass-fill: linear-gradient(135deg, var(--gf-1) 0%, var(--gf-2) 55%, var(--gf-3) 100%);
     --glass-edge: rgba(255,255,255,0.78);
     --glass-inner: inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(26,24,20,0.05), inset 0 0 22px -8px rgba(255,255,255,0.55);
     --glass-drop: 0 1px 2px rgba(26,24,20,0.04), 0 16px 38px -20px rgba(26,24,20,0.26);
@@ -1536,11 +1539,13 @@
     --blob-1: #46327E;   /* viridis ~0.15 — indigo */
     --blob-2: #21918C;   /* viridis  0.50 — teal */
     --blob-3: #B5DE2B;   /* viridis ~0.90 — yellow-green */
-    --blob-alpha: 0.34;
+    --blob-alpha: 0.21;
   }
 
   [data-theme="dark"] {
-    --glass-fill: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 55%, rgba(255,255,255,0.06) 100%);
+    --gf-1: rgba(255,255,255,0.10);
+    --gf-2: rgba(255,255,255,0.03);
+    --gf-3: rgba(255,255,255,0.06);
     --glass-edge: rgba(255,255,255,0.13);
     --glass-inner: inset 0 1px 0 rgba(255,255,255,0.20), inset 0 -1px 0 rgba(0,0,0,0.25), inset 0 0 22px -8px rgba(255,255,255,0.10);
     --glass-drop: 0 1px 2px rgba(0,0,0,0.25), 0 16px 40px -20px rgba(0,0,0,0.70);
@@ -1558,7 +1563,7 @@
     --blob-1: #51127C;   /* magma ~0.25 — purple */
     --blob-2: #B73779;   /* magma  0.50 — magenta */
     --blob-3: #FC8961;   /* magma ~0.75 — amber */
-    --blob-alpha: 0.34;
+    --blob-alpha: 0.22;
   }
 
   /* ── AMBIENT LAYER — the colour the glass refracts ── */
@@ -1832,14 +1837,91 @@
   }
   .section-header.visible .section-line { transform: scaleX(1); }
 
-  /* Theme switch: a circular wipe from the toggle (View Transitions API).
-     Per-element colour transitions are frozen during it so the new theme
-     arrives fully formed inside the circle. */
-  ::view-transition-old(root),
-  ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+  /* Theme switch: every palette colour is a registered custom property, so
+     the palette itself fades on <html> and the whole page — text, glass,
+     nav, blobs — moves between themes as one, in step. No snapshot of the
+     page is involved, so backdrop blur stays live throughout.
+     Per-element colour transitions are frozen during the fade (they would
+     otherwise trail a beat behind the palette). */
+  @property --cream { syntax: '<color>'; inherits: true; initial-value: #F5F0E8; }
+  @property --cream-dark { syntax: '<color>'; inherits: true; initial-value: #EDE8DC; }
+  @property --cream-deeper { syntax: '<color>'; inherits: true; initial-value: #E2DAC8; }
+  @property --ink { syntax: '<color>'; inherits: true; initial-value: #1A1814; }
+  @property --ink-light { syntax: '<color>'; inherits: true; initial-value: #3D3830; }
+  @property --ink-muted { syntax: '<color>'; inherits: true; initial-value: #7A7060; }
+  @property --border { syntax: '<color>'; inherits: true; initial-value: rgba(26,24,20,0.12); }
+  @property --shadow { syntax: '<color>'; inherits: true; initial-value: rgba(26,24,20,0.08); }
+  @property --blob-1 { syntax: '<color>'; inherits: true; initial-value: #46327E; }
+  @property --blob-2 { syntax: '<color>'; inherits: true; initial-value: #21918C; }
+  @property --blob-3 { syntax: '<color>'; inherits: true; initial-value: #B5DE2B; }
+  @property --gf-1 { syntax: '<color>'; inherits: true; initial-value: rgba(255,255,255,0.60); }
+  @property --gf-2 { syntax: '<color>'; inherits: true; initial-value: rgba(255,255,255,0.26); }
+  @property --gf-3 { syntax: '<color>'; inherits: true; initial-value: rgba(255,255,255,0.38); }
+  @property --glass-edge { syntax: '<color>'; inherits: true; initial-value: rgba(255,255,255,0.78); }
+  @property --glass-sheen { syntax: '<color>'; inherits: true; initial-value: rgba(255,255,255,0.55); }
+  @property --glass-glow { syntax: '<color>'; inherits: true; initial-value: rgba(255,255,255,0.42); }
+  @property --glass-nav { syntax: '<color>'; inherits: true; initial-value: rgba(245,240,232,0.40); }
+  @property --glass-nav-on { syntax: '<color>'; inherits: true; initial-value: rgba(245,240,232,0.62); }
+  @property --glass-menu { syntax: '<color>'; inherits: true; initial-value: rgba(245,240,232,0.80); }
+  @property --chip-fill { syntax: '<color>'; inherits: true; initial-value: rgba(255,255,255,0.46); }
+  @property --chip-edge { syntax: '<color>'; inherits: true; initial-value: rgba(26,24,20,0.10); }
+  @property --blob-alpha { syntax: '<number>'; inherits: true; initial-value: 0.21; }
+
+  html {
+    --theme-fade: 0.6s ease;
+    transition:
+      --cream var(--theme-fade),
+      --cream-dark var(--theme-fade),
+      --cream-deeper var(--theme-fade),
+      --ink var(--theme-fade),
+      --ink-light var(--theme-fade),
+      --ink-muted var(--theme-fade),
+      --border var(--theme-fade),
+      --shadow var(--theme-fade),
+      --blob-1 var(--theme-fade),
+      --blob-2 var(--theme-fade),
+      --blob-3 var(--theme-fade),
+      --gf-1 var(--theme-fade),
+      --gf-2 var(--theme-fade),
+      --gf-3 var(--theme-fade),
+      --glass-edge var(--theme-fade),
+      --glass-sheen var(--theme-fade),
+      --glass-glow var(--theme-fade),
+      --glass-nav var(--theme-fade),
+      --glass-nav-on var(--theme-fade),
+      --glass-menu var(--theme-fade),
+      --chip-fill var(--theme-fade),
+      --chip-edge var(--theme-fade),
+      --blob-alpha var(--theme-fade);
+  }
   html.theme-switching *,
   html.theme-switching *::before,
   html.theme-switching *::after { transition: none !important; }
+
+  /* Circular wipe (View Transitions API), where the browser supports it.
+     The palette fade above is switched off for its duration so the new theme
+     arrives fully formed inside the circle; it remains the fallback where
+     View Transitions are unavailable. */
+  html.theme-wipe { transition: none; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
+  /* The nav is lifted out of the page snapshot for the wipe. Inside a
+     snapshot its backdrop blur is not reliable, which showed as the bar's
+     transparency flickering mid-switch. Captured on its own, the blur is
+     supplied by the transition layer instead: the group box sits exactly
+     where the nav is and blurs the wiping page beneath it, and the nav's own
+     tint, edge and contents are drawn on top — the same stack as normal. */
+  html.theme-wipe nav { view-transition-name: site-nav; }
+  ::view-transition-group(site-nav) {
+    animation: none;
+    border-radius: 999px;
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    backdrop-filter: blur(28px) saturate(180%);
+  }
+  ::view-transition-image-pair(site-nav) { isolation: auto; }
+  ::view-transition-old(site-nav) { display: none; }
+  ::view-transition-new(site-nav) { animation: none; mix-blend-mode: normal; }
 
   /* ── MOBILE ── */
   @media (max-width: 900px) {
@@ -1959,6 +2041,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    html { transition: none; }
     .ambient span { animation: none; }
     .reveal { transform: none; transition: opacity 0.3s ease; }
     .section-header.reveal .section-line { transform: none; transition: none; }

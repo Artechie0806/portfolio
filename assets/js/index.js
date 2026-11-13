@@ -183,12 +183,26 @@ function applyTheme(dark) {
   try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
 }
 
+let themeTimer = null;
+let themeRun = 0;
 toggle.addEventListener('click', () => {
   const dark = html.getAttribute('data-theme') !== 'dark';
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const run = ++themeRun;
+  clearTimeout(themeTimer);
 
-  // No View Transitions support (or reduced motion): plain switch, CSS fades the colours.
-  if (!document.startViewTransition || reduce) { applyTheme(dark); return; }
+  // .theme-switching holds per-element colour transitions off while the
+  // theme changes, so nothing trails behind.
+  html.classList.add('theme-switching');
+
+  // Fallback (no View Transitions, or reduced motion): the palette fades in
+  // CSS via registered custom properties on <html>.
+  if (!document.startViewTransition || reduce) {
+    html.classList.remove('theme-wipe');
+    applyTheme(dark);
+    themeTimer = setTimeout(() => html.classList.remove('theme-switching'), 700);
+    return;
+  }
 
   // Circular wipe that grows out of the toggle button.
   const r = toggle.getBoundingClientRect();
@@ -196,7 +210,7 @@ toggle.addEventListener('click', () => {
   const y = r.top + r.height / 2;
   const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
 
-  html.classList.add('theme-switching');
+  html.classList.add('theme-wipe'); // before the snapshot: lifts the nav out of it (see CSS)
   const vt = document.startViewTransition(() => applyTheme(dark));
   vt.ready.then(() => {
     html.animate(
@@ -204,7 +218,10 @@ toggle.addEventListener('click', () => {
       { duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' }
     );
   }).catch(() => {});
-  vt.finished.finally(() => html.classList.remove('theme-switching'));
+  // Only the latest switch cleans up — a rapid second click skips the first.
+  vt.finished.finally(() => {
+    if (run === themeRun) html.classList.remove('theme-switching', 'theme-wipe');
+  });
 });
 
 // ── HAMBURGER ──
