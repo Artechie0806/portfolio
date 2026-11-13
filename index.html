@@ -56,6 +56,9 @@
 </head>
 <body>
 
+<!-- Ambient colour field — gives the glass surfaces something to refract -->
+<div class="ambient" aria-hidden="true"><span></span><span></span><span></span></div>
+
 <!-- ── PAGE LOADER ── -->
 <div id="loader" role="status" aria-label="Loading">
   <div class="loader-inner">
@@ -83,7 +86,7 @@
   </ul>
   <div style="display:flex;align-items:center;gap:0.75rem;">
     <button class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode" aria-pressed="false">☽</button>
-    <button class="hamburger" id="hamburger" aria-label="Menu">
+    <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -591,7 +594,7 @@
 <!-- FOOTER -->
 <footer>
   <p>© Aryan Rane.</p>
-  <div style="display:flex;gap:2rem;">
+  <div class="footer-links">
     <a href="https://github.com/Artechie0806" target="_blank" rel="noopener noreferrer">GitHub</a>
     <a href="https://www.linkedin.com/in/aryanrane0/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
     <a href="mailto:aryanrane.dev@gmail.com">Email</a>

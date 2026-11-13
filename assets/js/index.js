@@ -103,11 +103,17 @@
   type.className = 'hs-type';
   type.setAttribute('aria-hidden', 'true'); // the ghost is the accessible copy
 
+  // typed text | caret | untyped remainder (transparent). The overlay always
+  // holds the full sentence, so its line breaks never move while it types.
   var out = document.createElement('span');
   var caret = document.createElement('span');
   caret.className = 'hs-caret';
+  var rest = document.createElement('span');
+  rest.className = 'hs-rest';
+  rest.textContent = text;
   type.appendChild(out);
   type.appendChild(caret);
+  type.appendChild(rest);
 
   p.textContent = '';
   p.appendChild(ghost);
@@ -137,6 +143,7 @@
       credit -= n;
       i = Math.min(i + n, text.length);
       out.textContent = text.slice(0, i);
+      rest.textContent = text.slice(i);
       hold = HOLD[text.charAt(i - 1)] || 0;
     }
 
@@ -170,48 +177,171 @@ function syncToggle(dark) {
 if(saved === 'dark') { html.setAttribute('data-theme','dark'); }
 syncToggle(saved === 'dark');
 
+function applyTheme(dark) {
+  html.setAttribute('data-theme', dark ? 'dark' : 'light');
+  syncToggle(dark);
+  try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+}
+
 toggle.addEventListener('click', () => {
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  syncToggle(!isDark);
-  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  const dark = html.getAttribute('data-theme') !== 'dark';
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // No View Transitions support (or reduced motion): plain switch, CSS fades the colours.
+  if (!document.startViewTransition || reduce) { applyTheme(dark); return; }
+
+  // Circular wipe that grows out of the toggle button.
+  const r = toggle.getBoundingClientRect();
+  const x = r.left + r.width / 2;
+  const y = r.top + r.height / 2;
+  const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+
+  html.classList.add('theme-switching');
+  const vt = document.startViewTransition(() => applyTheme(dark));
+  vt.ready.then(() => {
+    html.animate(
+      { clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)', 'circle(' + radius + 'px at ' + x + 'px ' + y + 'px)'] },
+      { duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' }
+    );
+  }).catch(() => {});
+  vt.finished.finally(() => html.classList.remove('theme-switching'));
 });
 
 // ── HAMBURGER ──
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
-hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
-navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+function setMenu(open) {
+  navLinks.classList.toggle('open', open);
+  hamburger.classList.toggle('is-open', open);
+  hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+hamburger.addEventListener('click', (e) => {
+  e.stopPropagation();
+  setMenu(!navLinks.classList.contains('open'));
+});
+// Hold the menu open briefly after a tap so the glass block is seen gliding
+// to the chosen link, then close. (On desktop there is no menu to close.)
+let menuCloseTimer = null;
+navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  clearTimeout(menuCloseTimer);
+  menuCloseTimer = setTimeout(() => setMenu(false), 560);
+}));
+// Dismiss on a tap outside the menu, or Escape
+document.addEventListener('click', (e) => {
+  if (navLinks.classList.contains('open') && !navLinks.contains(e.target)) setMenu(false);
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
 
 // ── NAV ACTIVE STATE ──
 const sections = document.querySelectorAll('section[id]');
 const navAs = document.querySelectorAll('.nav-links a');
-window.addEventListener('scroll', () => {
+let activeId = '';
+
+// Park the sliding glass block (.nav-links::before) behind the active link.
+// Measured from the <li>, whose offsets are relative to the list itself.
+function placeIndicator() {
+  const a = navLinks.querySelector('a.is-active');
+  if (!a) { navLinks.style.setProperty('--ind-o', '0'); return; }
+  const li = a.parentElement;
+  navLinks.style.setProperty('--ind-x', li.offsetLeft + 'px');
+  navLinks.style.setProperty('--ind-y', li.offsetTop + 'px');
+  navLinks.style.setProperty('--ind-w', li.offsetWidth + 'px');
+  navLinks.style.setProperty('--ind-h', li.offsetHeight + 'px');
+  navLinks.style.setProperty('--ind-o', '1');
+}
+
+function setActive(id) {
+  activeId = id;
+  navAs.forEach(a => {
+    const on = a.getAttribute('href') === '#' + id;
+    a.style.color = on ? 'var(--ink)' : '';
+    a.classList.toggle('is-active', on);
+  });
+  placeIndicator();
+}
+
+function currentSection() {
   let cur = '';
   sections.forEach(s => { if(window.scrollY >= s.offsetTop - 120) cur = s.id; });
-  navAs.forEach(a => {
-    a.style.color = a.getAttribute('href') === '#' + cur ? 'var(--ink)' : '';
-  });
-});
+  return cur;
+}
+
+// A click sends the block straight to its target. While the page is still
+// smooth-scrolling there, scroll tracking is held off so the block doesn't
+// hop through every section it passes on the way.
+let navLockTimer = null;
+function lockNavTo(id) {
+  setActive(id);
+  clearTimeout(navLockTimer);
+  navLockTimer = setTimeout(unlockNav, 1500); // fallback where 'scrollend' is missing
+}
+function unlockNav() {
+  if (navLockTimer === null) return;
+  clearTimeout(navLockTimer);
+  navLockTimer = null;
+  setActive(currentSection());
+}
+window.addEventListener('scrollend', unlockNav);
+
+window.addEventListener('scroll', () => {
+  if (navLockTimer !== null) return;
+  const cur = currentSection();
+  if (cur !== activeId) setActive(cur);
+}, { passive: true });
+
+// Link widths change with the viewport and once the web fonts arrive
+window.addEventListener('resize', placeIndicator);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeIndicator);
+setActive(currentSection());
 
 // ── REVEAL ON SCROLL ──
+// Section headings join the reveal here rather than in the markup, so they
+// stay visible if this script never runs.
+document.querySelectorAll('.section-header, .project-category-label, .skills-grid').forEach(el => el.classList.add('reveal'));
+
 const reveals = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach((e, i) => {
+  // Stagger only among the elements arriving together in this batch
+  let n = 0;
+  entries.forEach((e) => {
     if(e.isIntersecting) {
-      e.target.style.transitionDelay = (i % 3) * 0.1 + 's';
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
+      const el = e.target;
+      const delay = (n++ % 4) * 0.09;
+      el.style.transitionDelay = delay + 's';
+      el.classList.add('visible');
+      observer.unobserve(el);
+      // Once it has landed, drop .reveal and the stagger delay so the element's
+      // own hover transition takes over (otherwise hovers inherit a slow,
+      // delayed reveal transition).
+      setTimeout(() => {
+        el.style.transitionDelay = '';
+        el.classList.remove('reveal');
+      }, delay * 1000 + 1700);
     }
   });
-}, { threshold: 0.1 });
+}, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
 reveals.forEach(r => observer.observe(r));
+
+// ── GLASS: POINTER-FOLLOWING HIGHLIGHT (desktop only) ──
+if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  document.querySelectorAll('.project-card, .skills-grid, .achievement-card, .resume-box, .about-sidebar').forEach(el => {
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    }, { passive: true });
+  });
+}
 
 // ── SMOOTH ACTIVE NAV ──
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', (e) => {
     const target = document.querySelector(a.getAttribute('href'));
-    if(target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    if(target) {
+      e.preventDefault();
+      lockNavTo(target.id);
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
   });
 });
 
