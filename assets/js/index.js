@@ -339,17 +339,6 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
 reveals.forEach(r => observer.observe(r));
 
-// ── GLASS: POINTER-FOLLOWING HIGHLIGHT (desktop only) ──
-if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-  document.querySelectorAll('.project-card, .skills-grid, .achievement-card, .resume-box, .about-sidebar').forEach(el => {
-    el.addEventListener('pointermove', (e) => {
-      const r = el.getBoundingClientRect();
-      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
-    }, { passive: true });
-  });
-}
-
 // ── SMOOTH ACTIVE NAV ──
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', (e) => {
@@ -465,4 +454,146 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     document.addEventListener('mousemove', move);
     document.addEventListener('mouseup', up);
   });
+})();
+
+// ── BACKGROUND: DRIFTING CONTOUR LINES ──
+// A fixed canvas behind the page draws the level lines of a slowly changing
+// noise field, like a topographic map that never quite settles. The lines
+// are traced fresh each frame (marching squares over a coarse grid), in the
+// page's ink colour at low opacity, so they follow the theme on their own.
+// Reduced-motion users get one still frame; hidden tabs draw nothing.
+(function () {
+  var canvas = document.createElement('canvas');
+  canvas.className = 'contours';
+  canvas.setAttribute('aria-hidden', 'true');
+  document.body.insertBefore(canvas, document.body.firstChild);
+  var ctx = canvas.getContext('2d');
+  if (!ctx) { canvas.remove(); return; }
+
+  var CELL = 16;          // grid spacing in CSS px — smaller is smoother, costlier
+  var SCALE = 1 / 620;    // noise zoom: larger divisor = broader, calmer shapes
+  var LINES = 9;          // how many level lines the field is cut into
+  var SPEED = 0.000028;   // drift per millisecond
+  var FRAME_MS = 1000 / 30;
+
+  // Classic 3D gradient noise with a fixed, seeded permutation so the pattern
+  // is the same on every visit.
+  var perm = new Uint8Array(512);
+  (function () {
+    var p = new Uint8Array(256), i, seed = 20261123;
+    for (i = 0; i < 256; i++) p[i] = i;
+    for (i = 255; i > 0; i--) {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      var j = seed % (i + 1), t = p[i]; p[i] = p[j]; p[j] = t;
+    }
+    for (i = 0; i < 512; i++) perm[i] = p[i & 255];
+  })();
+  function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+  function grad(h, x, y, z) {
+    h &= 15;
+    var u = h < 8 ? x : y, v = h < 4 ? y : (h === 12 || h === 14 ? x : z);
+    return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
+  }
+  function noise(x, y, z) {
+    var X = Math.floor(x), Y = Math.floor(y), Z = Math.floor(z);
+    x -= X; y -= Y; z -= Z; X &= 255; Y &= 255; Z &= 255;
+    var u = fade(x), v = fade(y), w = fade(z);
+    var A = perm[X] + Y, AA = perm[A] + Z, AB = perm[A + 1] + Z;
+    var B = perm[X + 1] + Y, BA = perm[B] + Z, BB = perm[B + 1] + Z;
+    var x1 = grad(perm[AA], x, y, z),         x2 = grad(perm[BA], x - 1, y, z);
+    var x3 = grad(perm[AB], x, y - 1, z),     x4 = grad(perm[BB], x - 1, y - 1, z);
+    var x5 = grad(perm[AA + 1], x, y, z - 1), x6 = grad(perm[BA + 1], x - 1, y, z - 1);
+    var x7 = grad(perm[AB + 1], x, y - 1, z - 1), x8 = grad(perm[BB + 1], x - 1, y - 1, z - 1);
+    var a = x1 + u * (x2 - x1), b = x3 + u * (x4 - x3);
+    var c = x5 + u * (x6 - x5), d = x7 + u * (x8 - x7);
+    var e = a + v * (b - a), f = c + v * (d - c);
+    return e + w * (f - e);
+  }
+
+  var W = 0, H = 0, cols = 0, rows = 0, field = null, dpr = 1;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    cols = Math.ceil(W / CELL) + 1;
+    rows = Math.ceil(H / CELL) + 1;
+    field = new Float32Array(cols * rows);
+  }
+
+  function draw(time) {
+    var z = time * SPEED, i, j, k;
+
+    // Sample the field: one broad octave plus a little finer detail.
+    for (j = 0; j < rows; j++) {
+      var ny = j * CELL * SCALE;
+      for (i = 0; i < cols; i++) {
+        var nx = i * CELL * SCALE;
+        field[j * cols + i] =
+          (noise(nx, ny, z) + 0.32 * noise(nx * 2.3 + 40, ny * 2.3 + 40, z * 1.6)) * LINES;
+      }
+    }
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.beginPath();
+
+    // Marching squares: wherever a whole-number level passes between two
+    // corners of a cell, find where it crosses each edge and join the points.
+    var px = [0, 0, 0, 0], py = [0, 0, 0, 0];
+    for (j = 0; j < rows - 1; j++) {
+      var y0 = j * CELL, y1 = y0 + CELL;
+      for (i = 0; i < cols - 1; i++) {
+        var o = j * cols + i;
+        var a = field[o], b = field[o + 1], c = field[o + cols + 1], d = field[o + cols];
+        var lo = Math.min(a, b, c, d), hi = Math.max(a, b, c, d);
+        var first = Math.ceil(lo), last = Math.floor(hi);
+        if (first > last) continue;
+        var x0 = i * CELL, x1 = x0 + CELL;
+        for (k = first; k <= last; k++) {
+          var n = 0;
+          if ((a < k) !== (b < k)) { px[n] = x0 + CELL * (k - a) / (b - a); py[n++] = y0; }   // top
+          if ((b < k) !== (c < k)) { px[n] = x1; py[n++] = y0 + CELL * (k - b) / (c - b); }   // right
+          if ((d < k) !== (c < k)) { px[n] = x0 + CELL * (k - d) / (c - d); py[n++] = y1; }   // bottom
+          if ((a < k) !== (d < k)) { px[n] = x0; py[n++] = y0 + CELL * (k - a) / (d - a); }   // left
+          if (n >= 2) { ctx.moveTo(px[0], py[0]); ctx.lineTo(px[1], py[1]); }
+          if (n === 4) { ctx.moveTo(px[2], py[2]); ctx.lineTo(px[3], py[3]); }
+        }
+      }
+    }
+
+    // The canvas's CSS colour is var(--ink), so this tracks the theme fade.
+    ctx.strokeStyle = getComputedStyle(canvas).color;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  var still = !!(reduce && reduce.matches);
+  var raf = 0, lastFrame = 0;
+
+  function tick(now) {
+    raf = requestAnimationFrame(tick);
+    if (now - lastFrame < FRAME_MS) return;
+    lastFrame = now;
+    draw(now);
+  }
+  function start() { if (!raf && !still && !document.hidden) raf = requestAnimationFrame(tick); }
+  function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+
+  resize();
+  draw(performance.now());
+  start();
+
+  window.addEventListener('resize', function () { resize(); draw(performance.now()); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) stop(); else start(); });
+  if (reduce && reduce.addEventListener) {
+    reduce.addEventListener('change', function (e) { still = e.matches; if (still) stop(); else start(); });
+  }
+  // A still frame has to be repainted by hand when the theme (and so the ink
+  // colour) changes; wait out the palette fade first.
+  new MutationObserver(function () {
+    if (still) setTimeout(function () { draw(performance.now()); }, 700);
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 })();
