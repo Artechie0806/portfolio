@@ -1841,6 +1841,86 @@
   ::view-transition-old(site-nav) { display: none; }
   ::view-transition-new(site-nav) { animation: none; mix-blend-mode: normal; }
 
+  /* ── CURSOR RIFT ──
+     A second copy of the page, in the opposite theme, fixed over the
+     viewport. index.js clips it to the shape of the tear behind the cursor
+     and keeps it scrolled in step with the page; while the pointer rests it
+     is hidden outright. It sits over the page and nav, and under the loader
+     curtain, the scrollbar and the grain. */
+  .rift {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    z-index: 8000;
+    pointer-events: none;
+    visibility: hidden;
+    clip-path: inset(50%);
+    /* Not a fade: a hair under 1 makes the browser flatten the whole copy
+       into one image before clipping it. Without that, each glass card
+       inside the copy blurs the clip's edge along with its backdrop, and the
+       rift comes out crisp over bare page but smeared over cards and the nav. */
+    opacity: 0.999;
+  }
+  /* The tear reads as tinted glass, not a hole. Two more layers, clipped by
+     the same script, sit either side of the copy:
+
+     .rift-glass, underneath — the frosting. It blurs and enriches the real
+     page showing through the tear, so what lies behind the glass arrives as
+     soft light rather than legible text, and lays a faint flat haze over it,
+     the scatter of frosted glass. */
+  .rift-glass {
+    position: fixed;
+    inset: 0;
+    z-index: 7999;
+    pointer-events: none;
+    visibility: hidden;
+    clip-path: inset(50%);
+    background: rgba(255,255,255,0.09);
+    -webkit-backdrop-filter: blur(12px) saturate(190%) brightness(1.08);
+    backdrop-filter: blur(12px) saturate(190%) brightness(1.08);
+  }
+  /* .rift-edge, on top — the lit rim: a hollow accent band around the tear.
+     Its glow spreads outward over the page and inward across the glass,
+     which is where the edge-lit look comes from. The glow is on a wrapper
+     because a filter on the clipped element itself would be clipped away
+     with it. */
+  .rift-glow {
+    position: fixed;
+    inset: 0;
+    z-index: 8001;
+    pointer-events: none;
+    visibility: hidden;
+    filter: drop-shadow(0 0 4px var(--accent-fill)) drop-shadow(0 0 24px var(--accent-fill));
+  }
+  .rift-edge {
+    position: absolute;
+    inset: 0;
+    background: var(--accent-fill);
+    clip-path: inset(50%);
+  }
+
+  /* Inside that copy: script positions it, so scrolling must not ease; the
+     loader never shows; and the grain is left to the real page, whose own
+     grain layer already lies over the rift. */
+  html.is-mirror { scroll-behavior: auto; }
+  html.is-mirror #loader,
+  html.is-mirror .loader-curtain,
+  html.is-mirror body::before { display: none; }
+
+  /* The copy's page colour is only a tint, so the frosted page shows through
+     behind its text and cards. --rift-tint is how solid the glass is: lower
+     is clearer. Where the page behind can't be frosted (or the tint can't be
+     mixed) the copy stays opaque, as two sharp copies of the same text laid
+     over each other would only muddy it. */
+  html.is-mirror { --rift-tint: 48%; }
+  @supports ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+    html.is-mirror body {
+      background: color-mix(in srgb, var(--cream) var(--rift-tint), transparent);
+    }
+  }
+
   /* ── MOBILE ── */
   @media (max-width: 900px) {
     :root { --glass-radius: 20px; }

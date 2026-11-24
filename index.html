@@ -22,17 +22,25 @@
 <script>
   // Set theme before first paint so the loader never flashes the wrong mode
   (function () {
-    try {
-      if ((localStorage.getItem('theme') || 'light') === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-    } catch (e) {}
-    document.documentElement.classList.add('loading');
+    var root = document.documentElement;
+
+    // The cursor rift (index.js) loads this page a second time inside a frame
+    // and shows it through the cursor's tail. That copy is always the opposite
+    // theme, and it never runs the loader.
+    var mirror = window.top !== window && /[?&]rift=1(&|$)/.test(location.search);
+
+    var dark = false;
+    try { dark = (localStorage.getItem('theme') || 'light') === 'dark'; } catch (e) {}
+    if (mirror) dark = !dark;
+    if (dark) root.setAttribute('data-theme', 'dark');
+    if (mirror) { root.classList.add('is-mirror'); return; }
+
+    root.classList.add('loading');
 
     // Failsafe: if index.js fails to load or throws, the page must not stay
     // scroll-locked behind the loader. Release it unconditionally after 6s.
     setTimeout(function () {
-      document.documentElement.classList.remove('loading');
+      root.classList.remove('loading');
     }, 6000);
   })();
 </script>
