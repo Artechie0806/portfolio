@@ -461,7 +461,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 // noise field, like a topographic map that never quite settles. The lines
 // are traced fresh each frame (marching squares over a coarse grid), in the
 // page's ink colour at low opacity, so they follow the theme on their own.
-// Reduced-motion users get one still frame; hidden tabs draw nothing.
+// Reduced-motion users get one still frame; hidden tabs draw nothing, and the
+// lines hold still while the page scrolls.
 (function () {
   var canvas = document.createElement('canvas');
   canvas.className = 'contours';
@@ -474,10 +475,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   var SCALE = 1 / 620;    // noise zoom: larger divisor = broader, calmer shapes
   var LINES = 9;          // how many level lines the field is cut into
   var SPEED = 0.000028;   // drift per millisecond
-  // 60fps cap. The few ms of slack keep a 60Hz screen from dropping frames
-  // when its frame timing jitters just under 16.7ms; faster screens still
-  // stop at roughly 60.
-  var FRAME_MS = 1000 / 60 - 3;
+  var SCROLL_REST = 150;  // ms without a scroll event before the drift resumes
 
   // Classic 3D gradient noise with a fixed, seeded permutation so the pattern
   // is the same on every visit.
@@ -579,22 +577,50 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
   var still = !!(reduce && reduce.matches);
-  var raf = 0, lastFrame = 0;
+  var raf = 0;
+
+  // The drift runs on its own clock, which only advances while the lines are
+  // moving, so they pick up exactly where they stopped after a pause.
+  var clock = performance.now(), prev = 0;
+
+  // Frame pacing: draw on every Nth screen refresh, with N picked so the
+  // drift lands near 60fps at an even cadence: every refresh on a 60-100Hz
+  // screen, every 2nd at 120-165Hz, every 4th at 240Hz. A "have 13.7ms
+  // passed?" gate can't do this: a 75Hz screen refreshes every 13.3ms, so
+  // the gate skipped every other frame and the lines ran at 37fps.
+  var refresh = 1000 / 60, nth = 1, count = 0;
+
+  // While the page scrolls, the lines hold still. Redrawing a full-screen
+  // canvas every frame competes with the scroll for the frame budget, and a
+  // pause in a drift this slow can't be seen.
+  var scrolling = false, scrollTimer = 0;
+  window.addEventListener('scroll', function () {
+    scrolling = true;
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(function () { scrolling = false; }, SCROLL_REST);
+  }, { passive: true });
 
   function tick(now) {
     raf = requestAnimationFrame(tick);
-    if (now - lastFrame < FRAME_MS) return;
-    lastFrame = now;
-    draw(now);
+    var dt = prev ? now - prev : 0;
+    prev = now;
+    if (dt > 0 && dt < 50) {
+      refresh += (dt - refresh) * 0.05;   // smoothed time between refreshes
+      nth = Math.max(1, Math.floor(1000 / 60 / refresh + 0.2));
+    }
+    if (scrolling) return;
+    clock += Math.min(dt, 100);           // no leap forward after a stall
+    if (++count % nth) return;
+    draw(clock);
   }
   function start() { if (!raf && !still && !document.hidden) raf = requestAnimationFrame(tick); }
-  function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+  function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } prev = 0; }
 
   resize();
-  draw(performance.now());
+  draw(clock);
   start();
 
-  window.addEventListener('resize', function () { resize(); draw(performance.now()); });
+  window.addEventListener('resize', function () { resize(); draw(clock); });
   document.addEventListener('visibilitychange', function () { if (document.hidden) stop(); else start(); });
   if (reduce && reduce.addEventListener) {
     reduce.addEventListener('change', function (e) { still = e.matches; if (still) stop(); else start(); });
@@ -605,6 +631,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   new MutationObserver(function (records) {
     ink = null;
     var themed = records.some(function (r) { return r.attributeName === 'data-theme'; });
-    if (still && themed) setTimeout(function () { ink = null; draw(performance.now()); }, 700);
+    if (still && themed) setTimeout(function () { ink = null; draw(clock); }, 700);
   }).observe(root, { attributes: true, attributeFilter: ['class', 'data-theme'] });
 })();
