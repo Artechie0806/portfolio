@@ -24,16 +24,9 @@
   (function () {
     var root = document.documentElement;
 
-    // The cursor rift (index.js) loads this page a second time inside a frame
-    // and shows it through the cursor's tail. That copy is always the opposite
-    // theme, and it never runs the loader.
-    var mirror = window.top !== window && /[?&]rift=1(&|$)/.test(location.search);
-
     var dark = false;
     try { dark = (localStorage.getItem('theme') || 'light') === 'dark'; } catch (e) {}
-    if (mirror) dark = !dark;
     if (dark) root.setAttribute('data-theme', 'dark');
-    if (mirror) { root.classList.add('is-mirror'); return; }
 
     root.classList.add('loading');
 

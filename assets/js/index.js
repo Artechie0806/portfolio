@@ -1,18 +1,4 @@
 
-// ── MIRROR ──
-// The cursor rift (bottom of this file) loads this page a second time inside
-// a frame, in the opposite theme, and shows it through the cursor's tail.
-// That copy is the "mirror". It runs this same script with MIRROR true: no
-// loader, no scrollbar, no rift of its own, and its nav and menu state are
-// pushed to it from the real page rather than worked out for itself.
-// On the real page, mirrorWin is the copy's window once it has loaded.
-const MIRROR = document.documentElement.classList.contains('is-mirror');
-let mirrorWin = null;
-function toMirror(fn, arg) {
-  if (!mirrorWin) return;
-  try { mirrorWin[fn](arg); } catch (e) {}
-}
-
 // ── PAGE LOADER ──
 (function () {
   var loader = document.getElementById('loader');
@@ -28,8 +14,6 @@ function toMirror(fn, arg) {
     remove(loader);
     remove(curtain);
   }
-
-  if (MIRROR) { reveal(); return; }
 
   // Only run the full loader once per browser session; repeat visits go straight in.
   var seen = false;
@@ -135,14 +119,6 @@ function toMirror(fn, arg) {
   p.appendChild(ghost);
   p.appendChild(type);
 
-  // The mirror goes straight to the finished line.
-  if (MIRROR) {
-    out.textContent = text;
-    rest.textContent = '';
-    caret.classList.add('is-blinking');
-    return;
-  }
-
   // Output streams at a steady character rate, driven off rAF rather than a
   // per-character setTimeout: frame-synced and drift-corrected, so the line
   // reads as smooth output instead of a stuttering timer. The only breaks in
@@ -192,8 +168,7 @@ function toMirror(fn, arg) {
 // ── THEME TOGGLE ──
 const toggle = document.getElementById('themeToggle');
 const html = document.documentElement;
-let saved = localStorage.getItem('theme') || 'light';
-if (MIRROR) saved = saved === 'dark' ? 'light' : 'dark'; // always the other theme
+const saved = localStorage.getItem('theme') || 'light';
 function syncToggle(dark) {
   toggle.textContent = dark ? '☀' : '☽';
   toggle.setAttribute('aria-pressed', dark ? 'true' : 'false');
@@ -256,7 +231,6 @@ function setMenu(open) {
   navLinks.classList.toggle('open', open);
   hamburger.classList.toggle('is-open', open);
   hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
-  toMirror('setMenu', open);
 }
 hamburger.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -301,7 +275,6 @@ function setActive(id) {
     a.classList.toggle('is-active', on);
   });
   placeIndicator();
-  toMirror('setActive', id);
 }
 
 function currentSection() {
@@ -325,16 +298,13 @@ function unlockNav() {
   navLockTimer = null;
   setActive(currentSection());
 }
-// (The mirror doesn't track its own scroll: setActive forwards each change.)
-if (!MIRROR) {
-  window.addEventListener('scrollend', unlockNav);
+window.addEventListener('scrollend', unlockNav);
 
-  window.addEventListener('scroll', () => {
-    if (navLockTimer !== null) return;
-    const cur = currentSection();
-    if (cur !== activeId) setActive(cur);
-  }, { passive: true });
-}
+window.addEventListener('scroll', () => {
+  if (navLockTimer !== null) return;
+  const cur = currentSection();
+  if (cur !== activeId) setActive(cur);
+}, { passive: true });
 
 // Link widths change with the viewport and once the web fonts arrive
 window.addEventListener('resize', placeIndicator);
@@ -367,13 +337,7 @@ const observer = new IntersectionObserver((entries) => {
     }
   });
 }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
-if (MIRROR) {
-  // The mirror jumps around rather than being scrolled through, so it would
-  // miss entrances; everything simply starts in its landed state.
-  reveals.forEach(el => { el.classList.add('visible'); el.classList.remove('reveal'); });
-} else {
-  reveals.forEach(r => observer.observe(r));
-}
+reveals.forEach(r => observer.observe(r));
 
 // ── SMOOTH ACTIVE NAV ──
 document.querySelectorAll('a[href^="#"]').forEach(a => {
@@ -400,7 +364,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 // ── CUSTOM OVERLAY SCROLLBAR (appears on scroll/edge-hover, fades when idle, no layout space) ──
 (function () {
-  if (MIRROR) return; // the real page's bar sits above the rift
   var track = document.createElement('div');
   track.className = 'scrollbar-track';
   track.setAttribute('aria-hidden', 'true');
@@ -511,7 +474,10 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   var SCALE = 1 / 620;    // noise zoom: larger divisor = broader, calmer shapes
   var LINES = 9;          // how many level lines the field is cut into
   var SPEED = 0.000028;   // drift per millisecond
-  var FRAME_MS = 1000 / 30;
+  // 60fps cap. The few ms of slack keep a 60Hz screen from dropping frames
+  // when its frame timing jitters just under 16.7ms; faster screens still
+  // stop at roughly 60.
+  var FRAME_MS = 1000 / 60 - 3;
 
   // Classic 3D gradient noise with a fixed, seeded permutation so the pattern
   // is the same on every visit.
@@ -548,6 +514,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   }
 
   var W = 0, H = 0, cols = 0, rows = 0, field = null, dpr = 1;
+  var root = document.documentElement;
+  var ink = null;         // cached stroke colour, see draw()
 
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -600,8 +568,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
       }
     }
 
-    // The canvas's CSS colour is var(--ink), so this tracks the theme fade.
-    ctx.strokeStyle = getComputedStyle(canvas).color;
+    // The canvas's CSS colour is var(--ink). Reading it forces a style
+    // recalc, so it is cached and only re-read every frame while the theme
+    // is changing (so the lines follow the palette fade).
+    if (!ink || root.classList.contains('theme-switching')) ink = getComputedStyle(canvas).color;
+    ctx.strokeStyle = ink;
     ctx.lineWidth = 1;
     ctx.stroke();
   }
@@ -609,456 +580,31 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
   var still = !!(reduce && reduce.matches);
   var raf = 0, lastFrame = 0;
-  var root = document.documentElement;
-
-  // In the mirror the lines have to land exactly where the real page draws
-  // them, so it runs on the real page's clock (a frame's own clock starts
-  // when the frame loads). It also only redraws while the rift is open.
-  var CLOCK = 0;
-  if (MIRROR) {
-    try { CLOCK = performance.timeOrigin - window.parent.performance.timeOrigin; } catch (e) {}
-  }
-  function clock() { return performance.now() + CLOCK; }
-  function shown() { return !MIRROR || root.classList.contains('rift-live'); }
 
   function tick(now) {
     raf = requestAnimationFrame(tick);
-    if (!shown() || now - lastFrame < FRAME_MS) return;
+    if (now - lastFrame < FRAME_MS) return;
     lastFrame = now;
-    draw(now + CLOCK);
+    draw(now);
   }
   function start() { if (!raf && !still && !document.hidden) raf = requestAnimationFrame(tick); }
   function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
 
   resize();
-  draw(clock());
+  draw(performance.now());
   start();
 
-  // Catch up the moment the rift opens, rather than showing a stale frame.
-  if (MIRROR) {
-    new MutationObserver(function () { if (shown()) draw(clock()); })
-      .observe(root, { attributes: true, attributeFilter: ['class'] });
-  }
-
-  window.addEventListener('resize', function () { resize(); draw(clock()); });
+  window.addEventListener('resize', function () { resize(); draw(performance.now()); });
   document.addEventListener('visibilitychange', function () { if (document.hidden) stop(); else start(); });
   if (reduce && reduce.addEventListener) {
     reduce.addEventListener('change', function (e) { still = e.matches; if (still) stop(); else start(); });
   }
-  // A still frame has to be repainted by hand when the theme (and so the ink
-  // colour) changes; wait out the palette fade first.
-  new MutationObserver(function () {
-    if (still) setTimeout(function () { draw(clock()); }, 700);
-  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-})();
-
-
-// ── CURSOR RIFT ──
-// Moving the pointer rips a short-lived tear in the page that shows the other
-// theme underneath. The cursor is the tip of the rip: the tear splits open
-// behind it with a jagged, faceted edge, throws out hairline cracks and
-// spinning shards, burns with a lit rim, and then heals shut.
-//
-// What shows through is the real other theme, not a colour inversion: this
-// same page, loaded a second time in a frame fixed over the viewport (the
-// "mirror", see the top of this file), set to the opposite theme and kept
-// scrolled in step. The frame is clipped to the shape of the tear, so once
-// the pointer rests and the tear has healed, nothing of the frame shows.
-//
-// The tear is glass rather than a hole. Three layers, bottom to top, all
-// clipped by the shapes built here (styling is in style.css):
-//   1. frosting — blurs the real page showing through the tear;
-//   2. the mirror — whose page background is only a tint, so the frosted
-//      page shows through behind its content;
-//   3. the lit rim — a hollow accent band around the tear, with a glow that
-//      spreads outward over the page and inward across the glass.
-//
-// Mouse only. Off for touch, for reduced motion, and where the page can't be
-// framed (opened straight from disk).
-(function () {
-  if (MIRROR || !window.matchMedia) return;
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  if (!window.CSS || !CSS.supports || !CSS.supports('clip-path', 'path("M0 0h1v1z")')) return;
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (reduce.matches) return;
-
-  var RADIUS = 64;   // half-width of the tear at its widest, px (fast strokes)
-  var LIFE = 640;    // ms before a stretch of the tear has healed shut
-  var OPEN = 130;    // ms a stretch takes to split fully open behind the tip
-  var FOLLOW = 40;   // lag of the tear's tip behind the pointer, ms
-  var STEP = 14;     // px between edge vertices: larger = longer, sharper facets
-  var EDGE = 5;      // typical thickness of the lit rim, px
-  var MAX_SHARDS = 36, MAX_CRACKS = 10;
-
-  var root = document.documentElement;
-  var view = null, mdoc = null, mroot = null;   // the frame, its document, its <html>
-  var glow = null, edge = null;                 // the lit rim: glow wrapper and clipped fill
-  var glass = null;                             // the frosting under the mirror
-  var live = false;                             // is the rift showing right now
-
-  // The tear's spine, oldest first. Each point carries its birth time, its
-  // size (0..1), and the fixed random offsets that make its edges jagged.
-  var pts = [];
-  var shards = [];              // loose triangles flung out of the tear
-  var cracks = [];              // hairline fractures branching off it
-  var mx = 0, my = 0;           // pointer
-  var hx = 0, hy = 0;           // tip of the tear, easing after the pointer
-  var size = 0;                 // 0..1: how wide new tear opens; swells with speed
-  var tracking = false;         // false until the pointer's position is known
-  var lastMove = 0, lastTick = 0, raf = 0;
-  var hovered = null;
-
-  function n1(v) { return Math.round(v * 10) / 10; }
-
-  function rnd(a, b) { return a + Math.random() * (b - a); }
-
-  // A value 0..1 that re-rolls every 70ms: makes the rim crackle.
-  function flick(seed, now) {
-    var v = Math.sin(seed + Math.floor(now / 70) * 12.9898) * 43758.5453;
-    return v - Math.floor(v);
-  }
-
-  // Everything is drawn as triangles, all wound the same way. Under the
-  // nonzero rule they then merge into one solid shape however the tear
-  // doubles back on itself — mixed windings would cancel and punch holes.
-  function tri(x1, y1, x2, y2, x3, y3) {
-    var area = (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
-    if (area > -0.5 && area < 0.5) return '';
-    if (area < 0) { var tx = x2, ty = y2; x2 = x3; y2 = y3; x3 = tx; y3 = ty; }
-    return 'M' + n1(x1) + ' ' + n1(y1) + 'L' + n1(x2) + ' ' + n1(y2) + 'L' + n1(x3) + ' ' + n1(y3) + 'Z';
-  }
-
-  // A band between a left and a right run of vertices (from index `from`).
-  function strip(lx, ly, rx, ry, m, from) {
-    var d = '';
-    for (var i = from || 0; i < m - 1; i++) {
-      d += tri(lx[i], ly[i], lx[i + 1], ly[i + 1], rx[i + 1], ry[i + 1]) +
-           tri(lx[i], ly[i], rx[i + 1], ry[i + 1], rx[i], ry[i]);
-    }
-    return d;
-  }
-
-  // Scratch vertex runs: inner left/right (the tear) and outer left/right (the rim).
-  var ilx = [], ily = [], irx = [], iry = [], olx = [], oly = [], orx = [], ory = [];
-  var dIn = '', dOut = '';
-
-  // Builds both outlines for this instant. dIn is the tear itself: it clips
-  // the mirror and the frosting under it. dOut is the rim, a hollow band
-  // hugging the outside of that shape — hollow, because the tear is glass and
-  // a solid fill behind it would show through.
-  function build(now) {
-    var i, j, m = 0, nx = 0, ny = 1;
-    dIn = ''; dOut = '';
-
-    // The tear: at each spine point, an edge vertex either side. A stretch
-    // splits open over OPEN ms, holds, then pinches shut as it nears LIFE.
-    for (i = 0; i < pts.length; i++) {
-      var p = pts[i], prev = pts[i - 1] || p, next = pts[i + 1];
-      var tx = (next ? next.x : hx) - prev.x, ty = (next ? next.y : hy) - prev.y;
-      var len = Math.sqrt(tx * tx + ty * ty);
-      if (len > 0.01) { nx = -ty / len; ny = tx / len; }
-      var age = now - p.t, k = age / LIFE;
-      var o = age < OPEN ? age / OPEN : 1;
-      var r = RADIUS * p.s * o * o * (3 - 2 * o) * (1 - k * k);
-      if (r < 0.5) r = 0;
-      var rim = EDGE * Math.min(1, r / 12);         // the rim dies with the tear
-      var l = r * p.jl, rr = r * p.jr;
-      var lo = l + rim * p.el * (0.5 + flick(p.seed, now));
-      var ro = rr + rim * p.er * (0.5 + flick(p.seed + 7, now));
-      ilx[m] = p.x + nx * l;  ily[m] = p.y + ny * l;
-      irx[m] = p.x - nx * rr; iry[m] = p.y - ny * rr;
-      olx[m] = p.x + nx * lo; oly[m] = p.y + ny * lo;
-      orx[m] = p.x - nx * ro; ory[m] = p.y - ny * ro;
-      m++;
-    }
-    if (m) {
-      // Both edges meet at the tip, under the cursor.
-      ilx[m] = irx[m] = olx[m] = orx[m] = hx;
-      ily[m] = iry[m] = oly[m] = ory[m] = hy;
-      m++;
-      dIn = strip(ilx, ily, irx, iry, m);
-      dOut = strip(ilx, ily, olx, oly, m) + strip(irx, iry, orx, ory, m);
-    }
-
-    // Cracks: a zigzag sliver that shoots out from the spine, tapering to a
-    // point, then thins away.
-    for (i = 0; i < cracks.length; i++) {
-      var c = cracks[i], ca = (now - c.t) / c.life;
-      var g = Math.min(1, (now - c.t) / 110); g = 1 - (1 - g) * (1 - g);   // shoots out, easing
-      var fade = 1 - ca * ca, last = c.qx.length - 1;
-      for (j = 0; j <= last; j++) {
-        var a = Math.max(j - 1, 0), b = Math.min(j + 1, last);
-        var cx = c.qx[b] - c.qx[a], cy = c.qy[b] - c.qy[a], cl = Math.sqrt(cx * cx + cy * cy) || 1;
-        var ux = -cy / cl, uy = cx / cl;
-        var x = c.x + c.qx[j] * g, y = c.y + c.qy[j] * g;
-        var w = c.w * fade * (1 - j / last), wo = j < last ? w + 1.8 * fade : 0;
-        ilx[j] = x + ux * w;  ily[j] = y + uy * w;
-        irx[j] = x - ux * w;  iry[j] = y - uy * w;
-        olx[j] = x + ux * wo; oly[j] = y + uy * wo;
-        orx[j] = x - ux * wo; ory[j] = y - uy * wo;
-      }
-      dIn += strip(ilx, ily, irx, iry, last + 1);
-      // Rim from the second vertex on: the first leg lies inside the tear.
-      dOut += strip(ilx, ily, olx, oly, last + 1, 1) + strip(irx, iry, orx, ory, last + 1, 1);
-    }
-
-    // Shards: triangles thrown clear of the tear, slowing, spinning and
-    // shrinking to nothing. Each is a window too, with its own lit rim.
-    for (i = 0; i < shards.length; i++) {
-      var s = shards[i], sec = (now - s.t) / 1000, left = 1 - (now - s.t) / s.life;
-      var d = (1 - Math.exp(-3 * sec)) / 3;         // distance under drag
-      var sx = s.x + s.vx * d, sy = s.y + s.vy * d, rot = s.rot + s.spin * sec;
-      var lit = Math.min(1, (now - s.t) / 100);     // the rim flares up as it breaks off
-      var r1 = s.r * left, r2 = r1 * s.k1, r3 = r1 * s.k2, pad = 2.6 * left * lit;
-      var c1 = Math.cos(rot), s1 = Math.sin(rot);
-      var c2 = Math.cos(rot + s.a1), s2 = Math.sin(rot + s.a1);
-      var c3 = Math.cos(rot + s.a2), s3 = Math.sin(rot + s.a2);
-      // Corners of the shard (inner) and of its rim (outer), as closed runs.
-      ilx[0] = ilx[3] = sx + c1 * r1; ily[0] = ily[3] = sy + s1 * r1;
-      ilx[1] = sx + c2 * r2;          ily[1] = sy + s2 * r2;
-      ilx[2] = sx + c3 * r3;          ily[2] = sy + s3 * r3;
-      olx[0] = olx[3] = sx + c1 * (r1 + pad); oly[0] = oly[3] = sy + s1 * (r1 + pad);
-      olx[1] = sx + c2 * (r2 + pad);          oly[1] = sy + s2 * (r2 + pad);
-      olx[2] = sx + c3 * (r3 + pad);          oly[2] = sy + s3 * (r3 + pad);
-      dIn += tri(ilx[0], ily[0], ilx[1], ily[1], ilx[2], ily[2]);
-      dOut += strip(ilx, ily, olx, oly, 4);
-    }
-  }
-
-  // Lays a new spine point at the tip. (nx, ny) is the normal to the
-  // direction of travel; a point that starts a fresh tear has no width, so
-  // the tear begins at a point rather than a blunt end.
-  function lay(now, first, nx, ny) {
-    var spike = Math.random() < 0.22 ? rnd(1.25, 1.6) : 1;   // the odd long facet
-    var p = {
-      x: hx, y: hy, t: now, s: first ? 0 : size, seed: Math.random() * 1000,
-      jl: rnd(0.62, 1.1) * (Math.random() < 0.5 ? spike : 1),
-      jr: rnd(0.62, 1.1) * (Math.random() < 0.5 ? spike : 1),
-      el: rnd(0.4, 1.7), er: rnd(0.4, 1.7)
-    };
-    pts.push(p);
-    if (first) return;
-
-    var side = Math.random() < 0.5 ? 1 : -1;
-    if (p.s > 0.45 && shards.length < MAX_SHARDS && Math.random() < 0.55 * p.s) {
-      // Shards break off where the tear's edge is about to be, not from its
-      // middle: inside the glass a shard is a window within a window, and
-      // only its rim would show, as a stray outline.
-      var v = rnd(90, 300) * p.s, drift = rnd(-50, 50), off = RADIUS * p.s * rnd(0.6, 1) * side;
-      shards.push({
-        x: p.x + nx * off, y: p.y + ny * off, t: now, life: rnd(420, 820),
-        vx: nx * side * v - ny * drift, vy: ny * side * v + nx * drift,
-        rot: rnd(0, 6.28), spin: rnd(-8, 8), r: rnd(5, 13) * (0.5 + p.s),
-        a1: rnd(1.6, 2.6), a2: rnd(3.7, 4.7), k1: rnd(0.5, 1), k2: rnd(0.5, 1)
-      });
-    }
-    if (p.s > 0.55 && cracks.length < MAX_CRACKS && Math.random() < 0.16) {
-      // First leg carries it out to the tear's edge; the rest zigzag beyond.
-      var ang = Math.atan2(ny * -side, nx * -side) + rnd(-0.5, 0.5);
-      var legs = Math.random() < 0.5 ? 3 : 4, bend = Math.random() < 0.5 ? 1 : -1;
-      var qx = [0], qy = [0], x = 0, y = 0;
-      for (var j = 0; j < legs; j++) {
-        var reach = j ? rnd(16, 42) * (0.5 + p.s) : RADIUS * p.s * 0.85;
-        x += Math.cos(ang) * reach; y += Math.sin(ang) * reach;
-        qx.push(x); qy.push(y);
-        bend = -bend;
-        ang += bend * rnd(0.35, 0.9);
-      }
-      cracks.push({ x: p.x, y: p.y, t: now, life: LIFE * rnd(0.55, 0.85), w: rnd(4, 8) * p.s, qx: qx, qy: qy });
-    }
-  }
-
-  function syncScroll() {
-    var w = view.contentWindow;
-    if (w.scrollY !== window.scrollY) w.scrollTo(0, window.scrollY);
-  }
-
-  // Hover can't reach the mirror (it takes no pointer events), so the element
-  // under the pointer there is marked by hand; see cloneHover.
-  function hover(el) {
-    if (el === hovered) return;
-    var n;
-    for (n = hovered; n && n !== mdoc.body; n = n.parentElement) n.classList.remove('rh');
-    for (n = el; n && n !== mdoc.body; n = n.parentElement) n.classList.add('rh');
-    hovered = el;
-  }
-
-  // Give every :hover rule in the mirror a twin that answers to .rh instead.
-  function cloneHover(list) {
-    for (var i = 0; i < list.length; i++) {
-      var rule = list[i];
-      if (rule.selectorText) {
-        if (rule.selectorText.indexOf(':hover') === -1) continue;
-        var owner = rule.parentRule || rule.parentStyleSheet;
-        owner.insertRule(rule.selectorText.replace(/:hover/g, '.rh') + '{' + rule.style.cssText + '}', i + 1);
-        i++;  // step over the twin just inserted
-      } else {
-        // A stylesheet, or an @media / @supports block. Reading the rules of
-        // a stylesheet from another origin (the web fonts) throws: skip it.
-        var inner = null;
-        try { inner = rule.cssRules; } catch (e) {}
-        if (inner) cloneHover(inner);
-      }
-    }
-  }
-
-  // Line the mirror's CSS animations up with the page's, so a pulsing dot or
-  // blinking caret is caught at the same instant on both sides of the edge.
-  function syncMotion() {
-    if (!document.getAnimations) return;
-    function key(a, counts) {
-      var t = a.effect && a.effect.target;
-      if (!a.animationName || !t) return null;
-      var k = a.animationName + '|' + (a.effect.pseudoElement || '') + '|' + t.tagName + '.' + t.className;
-      counts[k] = (counts[k] || 0) + 1;
-      return k + '#' + counts[k];
-    }
-    var mine = {}, counts = {};
-    document.getAnimations().forEach(function (a) { var k = key(a, counts); if (k) mine[k] = a; });
-    counts = {};
-    mdoc.getAnimations().forEach(function (a) {
-      var k = key(a, counts), b = k && mine[k];
-      if (b && b.currentTime !== null) a.currentTime = b.currentTime;
-    });
-  }
-
-  function syncTheme() {
-    var want = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    if (mroot.getAttribute('data-theme') === want) return;
-    mroot.setAttribute('data-theme', want);
-    toMirror('syncToggle', want === 'dark');
-  }
-
-  function setLive(on) {
-    if (on === live) return;
-    live = on;
-    view.style.visibility = glow.style.visibility = glass.style.visibility = on ? 'visible' : '';
-    mroot.classList.toggle('rift-live', on);
-    if (on) { syncScroll(); syncMotion(); }
-    else { view.style.clipPath = edge.style.clipPath = glass.style.clipPath = ''; hover(null); }
-  }
-
-  function close() {
-    if (raf) { cancelAnimationFrame(raf); raf = 0; }
-    pts.length = shards.length = cracks.length = 0;
-    size = 0;
-    tracking = false;
-    if (view && mroot) setLive(false);
-  }
-
-  function tick(now) {
-    raf = 0;
-    var dt = Math.min(Math.max(now - lastTick, 1), 50);
-    lastTick = now;
-
-    // The head eases after the pointer; its speed sets how wide the rift opens.
-    var k = 1 - Math.exp(-dt / FOLLOW);
-    var nx = hx + (mx - hx) * k, ny = hy + (my - hy) * k;
-    var speed = Math.sqrt((nx - hx) * (nx - hx) + (ny - hy) * (ny - hy)) / dt * 1000; // px/s
-    hx = nx; hy = ny;
-    var want = speed > 24 ? Math.min(1, 0.4 + speed / 1200) : 0;
-    size += (want - size) * (1 - Math.exp(-dt / (want > size ? 110 : 200)));
-    if (!want && size < 0.05) size = 0;  // don't let a speck linger at the cursor
-
-    var tip = pts[pts.length - 1];
-    if (!tip) {
-      if (size > 0.02) lay(now, true, 0, 1);
-    } else {
-      var gx = hx - tip.x, gy = hy - tip.y, gap = Math.sqrt(gx * gx + gy * gy);
-      if (gap >= STEP && size > 0.02) lay(now, false, -gy / gap, gx / gap);
-    }
-    while (pts.length && now - pts[0].t > LIFE) pts.shift();
-    shards = shards.filter(function (s) { return now - s.t < s.life; });
-    cracks = cracks.filter(function (c) { return now - c.t < c.life; });
-
-    build(now);
-    if (dIn || dOut) {
-      setLive(true);
-      view.style.clipPath = glass.style.clipPath = dIn ? 'path("' + dIn + '")' : '';
-      edge.style.clipPath = dOut ? 'path("' + dOut + '")' : '';
-      syncScroll();
-      hover(mdoc.elementFromPoint(mx, my));
-    } else {
-      setLive(false);
-      if (now - lastMove > 120) { pts.length = 0; return; }  // healed and at rest
-    }
-    raf = requestAnimationFrame(tick);
-  }
-
-  function onMove(e) {
-    if (e.pointerType === 'touch' || !mroot) return;
-    if (reduce.matches || root.classList.contains('theme-switching')) return;
-    mx = e.clientX; my = e.clientY;
-    if (!tracking) { hx = mx; hy = my; tracking = true; }  // no streak in from wherever it was last
-    lastMove = performance.now();
-    if (!raf) { lastTick = lastMove; raf = requestAnimationFrame(tick); }
-  }
-
-  function boot() {
-    view = document.createElement('iframe');
-    view.className = 'rift';
-    view.setAttribute('aria-hidden', 'true');
-    view.setAttribute('inert', '');           // keeps focus and find-in-page out of the copy
-    view.tabIndex = -1;
-    // The query string matters: a frame pointing at its own page's exact URL
-    // is refused as a loop. It is also how the copy knows what it is.
-    view.src = location.pathname + '?rift=1';
-    view.addEventListener('load', function () {
-      try {
-        mdoc = view.contentDocument;
-        if (!mdoc.documentElement.classList.contains('is-mirror')) throw 0;
-        cloneHover(mdoc.styleSheets);
-      } catch (e) {
-        // Not reachable (file://) or not our page: no rift.
-        mdoc = null;
-        view.remove();
-        glow.remove();
-        glass.remove();
-        return;
-      }
-      mroot = mdoc.documentElement;
-      mirrorWin = view.contentWindow;
-      syncTheme();
-      toMirror('setActive', activeId);
-      toMirror('setMenu', navLinks.classList.contains('open'));
-      window.addEventListener('pointermove', onMove, { passive: true });
-    });
-    glow = document.createElement('div');
-    glow.className = 'rift-glow';
-    glow.setAttribute('aria-hidden', 'true');
-    edge = document.createElement('div');
-    edge.className = 'rift-edge';
-    glow.appendChild(edge);
-    glass = document.createElement('div');
-    glass.className = 'rift-glass';
-    glass.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(glass);
-    document.body.appendChild(glow);
-    document.body.appendChild(view);
-  }
-
-  // Leaving the window drops the pointer's position, so coming back in
-  // elsewhere starts a fresh tail instead of a streak across the page.
-  root.addEventListener('pointerleave', function () { tracking = false; });
-
-  // A theme switch closes the rift (the wipe snapshots the page, and a rift
-  // caught in the snapshot would hang there), then the mirror swaps sides.
-  new MutationObserver(function () {
-    if (!mroot) return;
-    if (root.classList.contains('theme-switching')) close();
-    syncTheme();
+  // Any theme change drops the cached ink colour so the next frame picks up
+  // the new one. A still frame has to be repainted by hand when that happens;
+  // wait out the palette fade first.
+  new MutationObserver(function (records) {
+    ink = null;
+    var themed = records.some(function (r) { return r.attributeName === 'data-theme'; });
+    if (still && themed) setTimeout(function () { ink = null; draw(performance.now()); }, 700);
   }).observe(root, { attributes: true, attributeFilter: ['class', 'data-theme'] });
-
-  // Load the copy once the page has made its entrance, so it never competes
-  // with the loader for the first paint.
-  function whenReady(fn) {
-    if (root.classList.contains('site-ready')) { fn(); return; }
-    var mo = new MutationObserver(function () {
-      if (!root.classList.contains('site-ready')) return;
-      mo.disconnect();
-      fn();
-    });
-    mo.observe(root, { attributes: true, attributeFilter: ['class'] });
-  }
-  whenReady(function () { setTimeout(boot, 900); });
 })();
